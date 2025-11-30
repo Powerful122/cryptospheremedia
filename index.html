@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Powerful | Cryptosphere Media</title>
+    <meta name="description" content="Social media management and marketing for DeFi, RWA, and Tokenized Assets.">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts Fallback (Nunito Sans is very similar to Frutiger) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="antialiased selection:bg-brand-primary selection:text-white relative">
+
+    <!-- Decorative Background Elements -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <!-- Abstract shapes using brand colors -->
+        <div class="absolute -top-[10%] -right-[10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-brand-primary/10 to-transparent blur-3xl"></div>
+        <div class="absolute top-[20%] -left-[10%] w-[30vw] h-[30vw] rounded-full bg-brand-mid/5 blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-full h-1/3 bg-gradient-to-t from-white to-transparent"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-brand-bg/90 backdrop-blur-md border-b border-brand-deep/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo Section -->
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <!-- LOGO IMAGE: Ensure this file is in the same folder as index.html -->
+                    <img src="logo_with_black_BG-removebg-preview.png" alt="Powerful Logo" class="h-12 w-auto object-contain">
+                    <div class="flex flex-col leading-none">
+                        <span class="font-bold text-2xl tracking-tight text-brand-deep">Powerful</span>
+                        <span class="text-xs font-semibold text-brand-primary tracking-widest uppercase">Cryptosphere Media</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#about" class="text-brand-deep hover:text-brand-primary font-semibold transition-colors">About</a>
+                        <a href="#services" class="text-brand-deep hover:text-brand-primary font-semibold transition-colors">Services</a>
+                        <a href="#store" class="text-brand-deep hover:text-brand-primary font-semibold transition-colors">Store</a>
+                        <a href="#casestudy" class="text-brand-deep hover:text-brand-primary font-semibold transition-colors">Case Studies</a>
+                        <button onclick="openModal('privacyModal')" class="text-brand-deep hover:text-brand-primary font-semibold transition-colors">Privacy Policy</button>
+                        <a href="#contact" class="bg-brand-primary text-white hover:bg-brand-mid px-5 py-2.5 rounded-full font-bold transition-all shadow-lg shadow-brand-primary/30 transform hover:scale-105">
+                            Book Strategy Call
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-brand-deep hover:text-brand-primary p-2">
+                        <i data-lucide="menu" class="h-7 w-7"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-brand-deep/5 shadow-xl">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="#about" class="block px-3 py-3 rounded-md text-base font-bold text-brand-deep hover:bg-brand-bg hover:text-brand-primary">About</a>
+                <a href="#services" class="block px-3 py-3 rounded-md text-base font-bold text-brand-deep hover:bg-brand-bg hover:text-brand-primary">Services</a>
+                <a href="#store" class="block px-3 py-3 rounded-md text-base font-bold text-brand-deep hover:bg-brand-bg hover:text-brand-primary">Store</a>
+                <a href="#casestudy" class="block px-3 py-3 rounded-md text-base font-bold text-brand-deep hover:bg-brand-bg hover:text-brand-primary">Case Studies</a>
+                <button onclick="openModal('privacyModal')" class="block w-full text-left px-3 py-3 rounded-md text-base font-bold text-brand-deep hover:bg-brand-bg hover:text-brand-primary">Privacy Policy</button>
+                <a href="#contact" class="block mt-4 text-center px-3 py-3 rounded-md text-base font-bold bg-brand-primary text-white hover:bg-brand-mid">Book Strategy Call</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="lg:flex items-center gap-16">
+            <div class="lg:w-1/2 space-y-8">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-brand-primary/20 text-brand-primary text-sm font-bold shadow-sm">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-primary opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-primary"></span>
+                    </span>
+                    Accepting New DeFi Partners
+                </div>
+                
+                <h1 class="text-4xl sm:text-6xl font-extrabold leading-[1.1] text-brand-deep">
+                    We Translate <br />
+                    <span class="text-brand-primary">DeFi Mechanics</span> <br />
+                    Into Market Growth
+                </h1>
+                
+                <p class="text-brand-deep/80 text-lg sm:text-xl max-w-2xl font-medium leading-relaxed">
+                    Specialized marketing for <strong>RWA, Lending, and DEX protocols</strong>. We educate your audience and build high-conviction communities through data-driven content.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#services" class="px-8 py-4 bg-brand-primary text-white font-bold rounded-lg hover:bg-brand-mid transition-all shadow-lg shadow-brand-primary/25 flex items-center justify-center gap-2">
+                        Explore Services <i data-lucide="arrow-right" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#casestudy" class="px-8 py-4 bg-white text-brand-deep border-2 border-brand-deep/10 font-bold rounded-lg hover:border-brand-primary hover:text-brand-primary transition-all flex items-center justify-center gap-2">
+                        View Results
+                    </a>
+                </div>
+                
+                <!-- Badges -->
+                <div class="pt-8 border-t border-brand-deep/10">
+                    <p class="text-sm text-brand-mid font-bold uppercase tracking-wider mb-4">Core Expertise</p>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="px-3 py-1 bg-brand-primary/10 text-brand-deep rounded text-sm font-bold flex items-center gap-2">
+                            <i data-lucide="landmark" class="h-4 w-4"></i> RWA
+                        </span>
+                        <span class="px-3 py-1 bg-brand-primary/10 text-brand-deep rounded text-sm font-bold flex items-center gap-2">
+                            <i data-lucide="arrow-left-right" class="h-4 w-4"></i> DEXs
+                        </span>
+                        <span class="px-3 py-1 bg-brand-primary/10 text-brand-deep rounded text-sm font-bold flex items-center gap-2">
+                            <i data-lucide="percent" class="h-4 w-4"></i> Lending
+                        </span>
+                        <span class="px-3 py-1 bg-brand-primary/10 text-brand-deep rounded text-sm font-bold flex items-center gap-2">
+                            <i data-lucide="layers" class="h-4 w-4"></i> Tokenization
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hero Visual -->
+            <div class="hidden lg:block lg:w-1/2 relative mt-12 lg:mt-0">
+                <div class="relative bg-white p-8 rounded-2xl shadow-2xl border border-brand-deep/5 transform rotate-2 hover:rotate-0 transition-transform duration-500 z-10">
+                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-brand-primary/10 rounded-full blur-xl z-[-1]"></div>
+                    
+                    <!-- Analytics Mockup -->
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                            <div class="flex gap-2">
+                                <span class="font-bold text-brand-deep text-lg">Growth Metrics</span>
+                            </div>
+                            <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">+24% This Week</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-brand-bg p-4 rounded-xl border border-brand-deep/5">
+                                <p class="text-brand-mid text-xs font-bold uppercase mb-1">Total Impressions</p>
+                                <p class="text-3xl font-extrabold text-brand-deep">2.4M</p>
+                            </div>
+                            <div class="bg-brand-bg p-4 rounded-xl border border-brand-deep/5">
+                                <p class="text-brand-mid text-xs font-bold uppercase mb-1">Community Size</p>
+                                <p class="text-3xl font-extrabold text-brand-primary">45.2k</p>
+                            </div>
+                        </div>
+
+                        <!-- Chart Visual -->
+                        <div class="h-32 flex items-end justify-between gap-2 px-2">
+                            <div class="w-full bg-brand-primary/20 h-[40%] rounded-t-sm"></div>
+                            <div class="w-full bg-brand-primary/40 h-[60%] rounded-t-sm"></div>
+                            <div class="w-full bg-brand-primary/60 h-[50%] rounded-t-sm"></div>
+                            <div class="w-full bg-brand-primary/30 h-[70%] rounded-t-sm"></div>
+                            <div class="w-full bg-brand-primary h-[90%] rounded-t-sm relative group">
+                                <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-brand-deep text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">Record</div>
+                            </div>
+                            <div class="w-full bg-brand-primary/80 h-[80%] rounded-t-sm"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Background decorative card -->
+                <div class="absolute inset-0 bg-brand-primary rounded-2xl transform rotate-6 opacity-10 translate-x-4 translate-y-4 -z-10"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-brand-bg rounded-3xl p-8 md:p-12 shadow-sm border border-brand-deep/5">
+                <div class="md:flex gap-12 items-center">
+                    <div class="md:w-1/3 mb-8 md:mb-0 text-center md:text-left">
+                        <div class="inline-block relative">
+                            <div class="aspect-square w-64 md:w-full rounded-2xl bg-gradient-to-br from-brand-deep to-brand-primary p-1.5 shadow-xl">
+                                <div class="h-full w-full bg-white rounded-xl flex items-center justify-center overflow-hidden relative">
+                                    <!-- Placeholder Profile Image -->
+                                    <img src="/api/placeholder/400/400" alt="Founder Profile" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <!-- Floating Badge -->
+                            <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-xl shadow-lg border border-brand-deep/5 hidden md:block">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-green-100 rounded-full text-green-600">
+                                        <i data-lucide="trending-up" class="h-5 w-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 font-bold uppercase">Experience</p>
+                                        <p class="font-bold text-brand-deep">5+ Years in DeFi</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="md:w-2/3 space-y-6">
+                        <h2 class="text-3xl font-bold text-brand-deep">Bridging the gap between <span class="text-brand-primary">Protocol</span> and <span class="text-brand-primary">People</span></h2>
+                        <p class="text-brand-deep/80 text-lg leading-relaxed">
+                            At <strong>Powerful</strong>, we focus exclusively on the decentralized finance sector. We don't just post content—we translate complex mechanism designs into compelling narratives that retail users and institutions understand.
+                        </p>
+                        <p class="text-brand-deep/80 text-lg leading-relaxed">
+                            Whether you are launching a new RWA vault or scaling a DEX, our mission is to drive liquidity and governance participation through education.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-brand-deep/5 shadow-sm">
+                                <i data-lucide="check-circle-2" class="text-brand-primary h-5 w-5 flex-shrink-0"></i>
+                                <span class="text-brand-deep font-semibold">Native DeFi Understanding</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-brand-deep/5 shadow-sm">
+                                <i data-lucide="check-circle-2" class="text-brand-primary h-5 w-5 flex-shrink-0"></i>
+                                <span class="text-brand-deep font-semibold">Educational Thread Writing</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-brand-deep/5 shadow-sm">
+                                <i data-lucide="check-circle-2" class="text-brand-primary h-5 w-5 flex-shrink-0"></i>
+                                <span class="text-brand-deep font-semibold">Sentiment Analysis</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-brand-deep/5 shadow-sm">
+                                <i data-lucide="check-circle-2" class="text-brand-primary h-5 w-5 flex-shrink-0"></i>
+                                <span class="text-brand-deep font-semibold">Technical Marketing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 relative bg-brand-bg">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#00346e 1px, transparent 1px); background-size: 24px 24px;"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-deep mb-4">Strategic <span class="text-brand-primary">Services</span></h2>
+                <p class="text-brand-deep/70 max-w-2xl mx-auto text-lg">Tailored marketing solutions designed for the decentralized ecosystem.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Service 1 -->
+                <div class="modern-card p-8 rounded-xl group">
+                    <div class="h-14 w-14 bg-brand-primary/10 rounded-xl flex items-center justify-center text-brand-primary mb-6 group-hover:bg-brand-primary group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="share-2" class="h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-brand-deep">Social Media Management</h3>
+                    <p class="text-brand-deep/70 mb-6">
+                        Full-stack management of Twitter (X), LinkedIn, and Farcaster. We handle scheduling, engagement, and growth tactics.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-2 text-sm font-semibold text-brand-mid"><span class="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> Content Calendars</li>
+                        <li class="flex items-center gap-2 text-sm font-semibold text-brand-mid"><span class="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> Trend Jacking</li>
+                        <li class="flex items-center gap-2 text-sm font-semibold text-brand-mid"><span class="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> Monthly Analytics</li>
+                    </ul>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="modern-card p-8 rounded-xl group border-brand-primary/20">
+                    <div class="h-14 w-14 bg-brand-deep/10 rounded-xl flex items-center justify-center text-brand-deep mb-6 group-hover:bg-brand-deep group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="book-open" class="h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-brand-deep">Educational Content</h3>
+                    <p class="text-brand-deep/70 mb-6">
+                        We break down complex topics like RWA tokenization standards or AMM logic into digestible threads and articles.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-2 text-sm font-semibold text-brand-mid"><span class="w-1.5 h-1.5 rounded-full bg-brand-deep"></span> Deep Dive Threads</li>
+                        <li class="flex items-center gap-2 text-sm font-semibold text-brand-mid"><span class="w-1.5 h-1.5 rounded-full bg-brand-deep"></span> Protocol Explainers</li>
+                        <li class="flex items-center gap-2 text-sm font-semibold text-brand-mid"><span class="w-1.5 h-1.5 rounded-full bg-brand-deep"></span> Newsletter Writing</li>
+                    </ul>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="modern-card p-8 rounded-xl group">
+                    <div class="h-14 w-14 bg-brand-mid/10 rounded-xl flex items-center justify-center text-brand-mid mb-6 group-hover:bg-brand-mid group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="users" class="h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-brand-deep">Community Growth</h3>
+                    <p class="text-brand-deep/70 mb-6">
+                        Strategies to turn passive followers into active governance participants and protocol users via Discord and Telegram.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-2 text-sm font-semibold text-brand-mid"><span class="w-1.5 h-1.5 rounded-full bg-brand-mid"></span> AMA Hosting</li>
+                        <li class="flex items-center gap-2 text-sm font-semibold text-brand-mid"><span class="w-1.5 h-1.5 rounded-full bg-brand-mid"></span> Community Events</li>
+                        <li class="flex items-center gap-2 text-sm font-semibold text-brand-mid"><span class="w-1.5 h-1.5 rounded-full bg-brand-mid"></span> Mod Training</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Case Study Section -->
+    <section id="casestudy" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-deep mb-2">Case Study: <span class="text-brand-primary">Nexus RWA</span></h2>
+                    <p class="text-brand-deep/70 text-lg">From stealth launch to $50M TVL in 3 months.</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                   <span class="text-xs font-bold font-mono text-brand-mid border border-brand-mid/30 bg-brand-bg px-3 py-1 rounded">Q3 2024 Campaign</span>
+                </div>
+            </div>
+
+            <div class="bg-brand-deep rounded-2xl overflow-hidden shadow-2xl text-white">
+                <div class="grid md:grid-cols-2">
+                    <div class="p-8 md:p-12 space-y-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-primary mb-2 flex items-center gap-2"><i data-lucide="alert-circle" class="h-5 w-5"></i> The Challenge</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                A new Real World Asset protocol needed to explain the mechanism of tokenizing treasury bills to a retail audience that found the concept too technical and intimidating.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-primary mb-2 flex items-center gap-2"><i data-lucide="lightbulb" class="h-5 w-5"></i> The Strategy</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                We implemented a "Back to Basics" educational campaign. Created 15 visual threads explaining yield sources simply. Hosted weekly "DeFi Classroom" spaces to build trust.
+                            </p>
+                        </div>
+                        <div class="pt-6 border-t border-white/10">
+                            <div class="grid grid-cols-3 gap-6">
+                                <div>
+                                    <p class="text-4xl font-bold text-brand-bg">300%</p>
+                                    <p class="text-xs text-brand-primary uppercase font-bold tracking-wide mt-1">TVL Growth</p>
+                                </div>
+                                <div>
+                                    <p class="text-4xl font-bold text-brand-bg">12k</p>
+                                    <p class="text-xs text-brand-primary uppercase font-bold tracking-wide mt-1">New Users</p>
+                                </div>
+                                <div>
+                                    <p class="text-4xl font-bold text-brand-bg">45%</p>
+                                    <p class="text-xs text-brand-primary uppercase font-bold tracking-wide mt-1">Engagement</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side Visual -->
+                    <div class="bg-brand-mid/50 p-8 md:p-12 flex items-center justify-center relative overflow-hidden">
+                         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+                         
+                         <div class="relative z-10 w-full max-w-sm">
+                             <!-- Chart Card 1 -->
+                             <div class="bg-white text-brand-deep rounded-lg p-5 shadow-2xl mb-6 transform -rotate-2">
+                                 <div class="flex items-center justify-between mb-4">
+                                     <div class="flex items-center gap-3">
+                                         <div class="h-8 w-8 rounded-full bg-brand-primary flex items-center justify-center text-white font-bold">N</div>
+                                         <div>
+                                             <div class="font-bold text-sm">Nexus Token</div>
+                                             <div class="text-xs text-gray-400">RWA Index</div>
+                                         </div>
+                                     </div>
+                                     <span class="text-green-600 font-bold text-sm">+12.4%</span>
+                                 </div>
+                                 <!-- Fake Sparkline -->
+                                 <div class="h-16 w-full flex items-end gap-1">
+                                     <div class="w-1/6 bg-brand-primary/20 h-1/3 rounded-sm"></div>
+                                     <div class="w-1/6 bg-brand-primary/40 h-1/2 rounded-sm"></div>
+                                     <div class="w-1/6 bg-brand-primary/30 h-1/4 rounded-sm"></div>
+                                     <div class="w-1/6 bg-brand-primary/60 h-2/3 rounded-sm"></div>
+                                     <div class="w-1/6 bg-brand-primary h-full rounded-sm"></div>
+                                     <div class="w-1/6 bg-brand-primary/80 h-3/4 rounded-sm"></div>
+                                 </div>
+                             </div>
+                             
+                             <!-- Floating Tweet Card -->
+                             <div class="bg-white text-brand-deep rounded-lg p-5 shadow-2xl transform rotate-3 ml-8 border border-gray-100">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="h-6 w-6 bg-gray-200 rounded-full"></div>
+                                    <div class="h-2 w-20 bg-gray-200 rounded"></div>
+                                </div>
+                                <div class="h-2 w-full bg-gray-100 rounded mb-2"></div>
+                                <div class="h-2 w-5/6 bg-gray-100 rounded mb-4"></div>
+                                <div class="flex gap-4 text-gray-300">
+                                    <i data-lucide="heart" class="h-4 w-4 fill-brand-primary text-brand-primary"></i>
+                                    <span class="text-xs font-bold text-brand-primary">2.4k Likes</span>
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Store Section -->
+    <section id="store" class="py-20 bg-brand-bg relative overflow-hidden">
+        <!-- Decorative Circle -->
+        <div class="absolute -left-20 top-1/2 -translate-y-1/2 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="modern-card rounded-3xl p-8 md:p-16 border border-brand-primary/20 text-center">
+                <span class="inline-block px-4 py-1.5 rounded-full bg-brand-primary/10 text-brand-primary text-sm font-bold mb-6">Educational Resources</span>
+                
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-deep mb-6">Master the Cryptosphere</h2>
+                
+                <p class="text-brand-deep/70 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+                    Elevate your understanding of decentralized finance with our curated collection of books. From "DeFi 101" for beginners to advanced "Tokenomics Engineering" for protocol founders, we provide the knowledge you need to succeed.
+                </p>
+
+                <div class="flex flex-col sm:flex-row justify-center gap-6 items-center">
+                    <!-- Book Preview (Visual) -->
+                    <div class="flex items-center gap-4 text-left p-4 bg-white rounded-xl border border-brand-deep/5 shadow-sm max-w-sm w-full hover:border-brand-primary/50 transition-colors cursor-pointer group">
+                        <div class="h-16 w-12 bg-brand-deep rounded flex-shrink-0 flex items-center justify-center text-white/50 text-xs shadow-md group-hover:bg-brand-primary transition-colors">Cover</div>
+                        <div>
+                            <p class="font-bold text-brand-deep">The DeFi Playbook</p>
+                            <p class="text-sm text-brand-deep/60">Bestseller • 200+ Pages</p>
+                        </div>
+                        <i data-lucide="arrow-right" class="h-5 w-5 ml-auto text-brand-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </div>
+
+                    <a href="#" class="px-8 py-4 bg-brand-primary text-white font-bold rounded-lg hover:bg-brand-mid transition-all shadow-lg shadow-brand-primary/30 flex items-center justify-center gap-2 transform hover:-translate-y-1 w-full sm:w-auto">
+                        <i data-lucide="shopping-bag" class="h-5 w-5"></i> Visit Our Store
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact / CTA -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-deep mb-6">Ready to scale your <span class="text-brand-primary">Protocol?</span></h2>
+            <p class="text-brand-deep/70 mb-10 text-xl">Let's discuss how Powerful can educate your audience and increase your liquidity.</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="mailto:contact@powerful.com" class="px-8 py-4 bg-brand-deep text-white font-bold rounded-lg hover:bg-brand-mid transition-all shadow-xl flex items-center justify-center gap-2 transform hover:-translate-y-1">
+                    <i data-lucide="mail" class="h-5 w-5"></i> Email Us
+                </a>
+                <a href="#" class="px-8 py-4 bg-white text-brand-deep border border-brand-deep/10 font-bold rounded-lg hover:border-brand-primary hover:text-brand-primary transition-all flex items-center justify-center gap-2 shadow-sm">
+                    <i data-lucide="twitter" class="h-5 w-5"></i> DM on Twitter
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-brand-deep text-white py-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-2xl tracking-tight">Powerful</span>
+                </div>
+                
+                <!-- Social Icons -->
+                <div class="flex items-center gap-6">
+                    <a href="#" class="text-white/60 hover:text-white transition-colors hover:scale-110 transform duration-200" aria-label="Twitter">
+                        <i data-lucide="twitter" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#" class="text-white/60 hover:text-white transition-colors hover:scale-110 transform duration-200" aria-label="Facebook">
+                        <i data-lucide="facebook" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#" class="text-white/60 hover:text-white transition-colors hover:scale-110 transform duration-200" aria-label="YouTube">
+                        <i data-lucide="youtube" class="h-5 w-5"></i>
+                    </a>
+                </div>
+
+                <div class="flex gap-8 text-sm font-medium">
+                    <button onclick="openModal('privacyModal')" class="text-brand-bg/80 hover:text-white transition-colors">Privacy Policy</button>
+                    <a href="#" class="text-brand-bg/80 hover:text-white transition-colors">Terms of Service</a>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/10 pt-8 text-center md:text-left text-sm text-brand-bg/40">
+                &copy; 2025 Powerful. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacyModal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-brand-deep/60 backdrop-blur-sm transition-opacity" onclick="closeModal('privacyModal')"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-brand-deep/10">
+                    
+                    <!-- Modal Header -->
+                    <div class="bg-brand-bg px-4 py-4 sm:px-6 flex justify-between items-center border-b border-brand-deep/5">
+                        <h3 class="text-lg font-bold leading-6 text-brand-deep" id="modal-title">Privacy Policy</h3>
+                        <button onclick="closeModal('privacyModal')" class="text-gray-400 hover:text-brand-deep transition-colors">
+                            <i data-lucide="x" class="h-6 w-6"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="px-4 py-6 sm:p-6 text-brand-deep/80 max-h-[60vh] overflow-y-auto">
+                        <h4 class="font-bold text-brand-deep mb-2">1. Introduction</h4>
+                        <p class="mb-4 text-sm leading-relaxed">
+                            We respect your privacy and are committed to protecting it through our compliance with this policy. This policy describes the types of information we may collect from you or that you may provide when you visit this website.
+                        </p>
+
+                        <h4 class="font-bold text-brand-deep mb-2">2. Information We Collect</h4>
+                        <p class="mb-4 text-sm leading-relaxed">
+                            We may collect personal identification information from Users in a variety of ways, including, but not limited to, when Users visit our site, fill out a form, and in connection with other activities, services, features, or resources we make available on our Site.
+                        </p>
+
+                        <h4 class="font-bold text-brand-deep mb-2">3. Web3 & Analytics</h4>
+                        <p class="mb-4 text-sm leading-relaxed">
+                            Unlike traditional marketing sites, we prioritize user anonymity. We do not track wallet addresses unless voluntarily submitted for invoicing purposes. We use basic analytics to understand site traffic without personally identifying individual visitors.
+                        </p>
+
+                        <h4 class="font-bold text-brand-deep mb-2">4. Contact Information</h4>
+                        <p class="mb-4 text-sm leading-relaxed">
+                            If you have questions about this policy, please contact us via the contact methods listed on the homepage.
+                        </p>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="bg-brand-bg px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-brand-deep/5">
+                        <button type="button" onclick="closeModal('privacyModal')" class="inline-flex w-full justify-center rounded-lg border border-transparent bg-brand-primary px-5 py-2 text-base font-bold text-white shadow-sm hover:bg-brand-mid focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                            Understood
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link to External JS (at the end of body) -->
+    <script src="script.js"></script>
+</body>
+</html>
