@@ -1,1186 +1,445 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Powerful - Content Approval Console</title>
-    <!-- Using 'Source Sans 3' as a professional, humanist sans-serif alternative for Frutiger. -->
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Social Icons and WhatsApp icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJc5nIz18qgUfXfO8gMv9qV9+LLMDJc5nIz18qgUfXfO8gMv9qV9+R0b7pUvY+8S4hE4U/q8P8+2KxYd90B8v5fA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-        /* CSS for the Tool */
-        :root {
-            --color-primary-dark: #00346e;
-            --color-primary-medium: #00418b;
-            --color-primary-light: #006fc6;
-            --color-background: #fdf9f3;
-            --font-family: 'Source Sans 3', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --color-approved: #28a745;
-            --color-disapproved: #dc3545;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Powerful — Content Approval (Supabase)</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+  <style>
+    /* Brand colors: #00346e, #00418b, #006fc6, #fdf9f3 */
+    :root{
+      --brand-1:#00346e;
+      --brand-2:#00418b;
+      --brand-3:#006fc6;
+      --bg:#fdf9f3;
+      --glass: rgba(255,255,255,0.85);
+      --radius:12px;
+      --frutiger: 'Frutiger', 'Frutiger Linotype', 'Helvetica Neue', Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#ffffff);font-family:var(--frutiger);color:#052036}
+    header{display:flex;align-items:center;gap:16px;padding:18px;border-bottom:1px solid rgba(0,0,0,0.06);background:white}
+    header img{height:48px}
+    .wrap{max-width:1100px;margin:24px auto;padding:18px}
 
-        body {
-            font-family: var(--font-family);
-            background-color: #e0e6ec;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column; 
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 100vh;
-            padding-top: 20px;
-        }
+    /* Card */
+    .card{background:var(--glass);padding:16px;border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,0.06)}
 
-        .container {
-            width: 95%;
-            max-width: 1200px;
-            background-color: #fff;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            flex-grow: 1; 
-        }
+    /* Controls */
+    .top-controls{display:flex;gap:8px;margin-bottom:12px}
+    .inline-row{display:flex;gap:8px}
+    input, textarea, button, select{font-family:var(--frutiger);font-size:14px}
+    input[type=text], input[type=password], textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #d7e6f6}
+    button{padding:10px 14px;border-radius:8px;border:0;background:var(--brand-2);color:white;cursor:pointer}
+    button.secondary{background:transparent;color:var(--brand-2);border:1px solid var(--brand-2)}
 
-        /* --- Header & Branding --- */
-        header {
-            background-color: var(--color-primary-dark);
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 5px solid var(--color-primary-light);
-            position: relative; 
-        }
-        header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-        .logo {
-            height: 35px;
-            filter: invert(0.9); 
-        }
-        .logo-container {
-            display: flex;
-            align-items: center;
-        }
+    /* Admin console */
+    .admin-header{display:flex;justify-content:space-between;align-items:center}
+    .post-list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    .post-item{padding:10px;border-radius:10px;background:white;border:1px solid rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center}
+    .small{font-size:13px;color:#4a6b89}
 
-        /* NEW: CTA Container for "Suggest" Button and Switch Button */
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px; 
-        }
+    /* Viewer UI */
+    .viewer-login{display:flex;flex-direction:column;gap:8px}
+    .viewer-intro{background:linear-gradient(90deg,var(--brand-3),var(--brand-2));color:white;padding:12px;border-radius:8px;margin-bottom:12px}
+    .headline{font-weight:700}
 
-        /* Custom style for the Suggest button (CTA) */
-        .btn-suggest {
-            background-color: var(--color-approved); 
-            color: white;
-            padding: 8px 14px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            border-radius: 6px;
-        }
-        .btn-suggest:hover {
-            background-color: #38c155;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .btn-suggest i {
-            margin-right: 8px;
-        }
+    /* Modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:60}
+    .modal.open{display:flex}
+    .modal .panel{width:90%;max-width:780px;background:white;padding:18px;border-radius:10px;max-height:90vh;overflow:auto}
+    .media{max-width:100%;height:auto;margin-top:8px;border-radius:8px}
 
-
-        /* --- Footer Styles --- */
-        footer {
-            width: 100%;
-            max-width: 1200px;
-            background-color: var(--color-primary-dark); 
-            color: white;
-            padding: 20px 25px;
-            border-radius: 0 0 12px 12px;
-            text-align: center;
-            margin-top: auto; 
-            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .footer-content {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 95%;
-            margin: 0 auto;
-            flex-wrap: wrap;
-        }
-        .social-icons a {
-            color: white;
-            margin: 0 10px;
-            font-size: 1.5rem;
-            transition: color 0.3s;
-        }
-        .social-icons a:hover {
-            color: var(--color-primary-light);
-        }
-        .copyright {
-            font-size: 0.9rem;
-            margin-top: 10px;
-        }
-
-
-        /* --- Global Styles --- */
-        .content {
-            padding: 30px 25px;
-            background-color: var(--color-background);
-        }
-
-        button, input[type="submit"] {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s, transform 0.1s;
-            font-family: var(--font-family);
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        button:active {
-            transform: translateY(1px);
-        }
-        
-        .btn-primary {
-            background-color: var(--color-primary-medium);
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: var(--color-primary-light);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-approve { background-color: var(--color-approved); color: white; }
-        .btn-disapprove { background-color: var(--color-disapproved); color: white; }
-        .btn-edit { background-color: #ffc107; color: #333; }
-
-        .btn-approve:hover { background-color: #38c155; }
-        .btn-disapprove:hover { background-color: #f75565; }
-        .btn-edit:hover { background-color: #e6b300; }
-
-
-        input[type="text"], textarea, input[type="password"] {
-            width: calc(100% - 22px);
-            padding: 11px;
-            margin: 8px 0 18px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-family: var(--font-family);
-        }
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: 600;
-            color: var(--color-primary-dark);
-        }
-        hr {
-            border: 0;
-            height: 1px;
-            background-color: #ddd;
-            margin: 20px 0;
-        }
-
-        /* --- Login UI --- */
-        #login-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 450px;
-            text-align: center;
-        }
-        .login-box {
-            background-color: white;
-            padding: 50px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 450px;
-        }
-        .login-box h2 {
-            color: var(--color-primary-dark);
-            margin-top: 0;
-            font-size: 1.8rem;
-        }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; 
-            background: rgba(255, 255, 255, 0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            font-weight: 600;
-            z-index: 200;
-            color: var(--color-primary-dark);
-            text-align: center;
-            padding: 20px;
-        }
-        /* Spinner */
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: var(--color-primary-medium);
-            animation: spin 1s ease infinite;
-            margin-bottom: 15px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        /* Red alert message when data loading fails */
-        .load-error {
-            color: var(--color-disapproved);
-            font-weight: 700;
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid var(--color-disapproved);
-            border-radius: 6px;
-            max-width: 400px;
-            font-size: 0.9em;
-        }
-
-
-        /* --- Admin Console Specific --- */
-        #admin-view, #viewer-view {
-            display: none;
-        }
-        .post-list {
-            list-style: none;
-            padding: 0;
-        }
-        .post-item {
-            background-color: white;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-        .post-details {
-             flex-grow: 1;
-             margin-right: 15px;
-        }
-        .post-status {
-            font-weight: 700;
-            padding: 5px 12px;
-            border-radius: 4px;
-            margin-left: 15px;
-            min-width: 120px;
-            text-align: center;
-            font-size: 0.95rem;
-        }
-        .status-Pending { background-color: #ffc107; color: #333; }
-        .status-Approved { background-color: var(--color-approved); color: white; }
-        .status-Disapproved { background-color: var(--color-disapproved); color: white; }
-        .admin-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* --- Viewer Console Specific --- */
-        .viewer-post-summary {
-            cursor: pointer;
-            background-color: white;
-            border-left: 5px solid var(--color-primary-medium);
-            padding: 18px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            transition: background-color 0.2s, transform 0.1s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-        }
-        .viewer-post-summary:hover {
-            background-color: #e6f0ff;
-            transform: translateY(-2px);
-        }
-        .viewer-post-summary h3 {
-            margin: 0;
-            color: var(--color-primary-dark);
-            font-size: 1.25rem;
-        }
-        .viewer-post-summary p {
-            margin: 5px 0 0 0;
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        /* --- Overlay (Modal) for Post Viewing and Admin Editing --- */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-        }
-        .modal-content {
-            background-color: var(--color-background);
-            margin: 5vh auto;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 850px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-        .close-btn {
-            color: #aaa;
-            float: right;
-            font-size: 32px;
-            font-weight: bold;
-            line-height: 1;
-            margin-top: -10px;
-        }
-        .close-btn:hover, .close-btn:focus {
-            color: #333;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .modal-post-media {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 20px 0;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        .modal-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #ddd;
-            justify-content: flex-end;
-        }
-        .modal-comment-section h4 {
-            color: var(--color-primary-dark);
-            margin-bottom: 10px;
-        }
-        .modal-comment-section {
-            margin-top: 20px;
-        }
-
-        @media (max-width: 768px) {
-            header h1 { font-size: 1.4rem; }
-            .container { padding: 0; border-radius: 0; }
-            .content { padding: 15px; }
-            .post-item { flex-direction: column; align-items: flex-start; }
-            .admin-actions { margin-top: 10px; }
-            .post-status { margin-left: 0; margin-top: 10px; }
-            .modal-content { margin: 10vh auto; }
-            .footer-content {
-                flex-direction: column;
-            }
-            .copyright {
-                order: 2;
-                margin-top: 15px;
-            }
-            .social-icons {
-                order: 1;
-                margin-bottom: 15px;
-            }
-            .header-actions {
-                flex-direction: column;
-                align-items: flex-end;
-                gap: 5px;
-            }
-            .btn-suggest {
-                order: 1; 
-            }
-            #switch-view-btn {
-                order: 2; 
-                font-size: 0.8rem;
-                padding: 6px 10px;
-            }
-        }
-    </style>
+    /* responsive */
+    @media (max-width:900px){.wrap{padding:12px}}
+  </style>
 </head>
 <body>
-    <div id="loading-overlay" class="loading-overlay">
-        <div class="spinner"></div>
-        Authenticating and loading content in the background...
-        <p style="font-size: 0.9em; margin-top: 15px;">
-            The application is fetching data in real-time from Firestore, guaranteeing post permanence.
-        </p>
+  <header>
+    <img src="https://www.powerful.ng/logo_with_black_BG-removebg-preview.png" alt="Powerful logo">
+    <div>
+      <div style="font-weight:700;font-size:18px;color:var(--brand-1)">Powerful</div>
+      <div class="small">Content approval — admin & viewer consoles</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="top-controls">
+      <button id="showAdminBtn">Admin View</button>
+      <button id="showViewerBtn" class="secondary">Viewer View</button>
     </div>
 
-    <div class="container">
-        <header>
-            <div class="logo-container">
-                <img src="https://www.powerful.ng/logo_with_black_BG-removebg-preview.png" alt="Powerful Logo" class="logo">
-                <h1>Content Approval Console</h1>
-            </div>
-            
-            <!-- NEW: Header Actions Container -->
-            <div class="header-actions">
-                <!-- NEW: Suggest Button / Client CTA -->
-                <a href="https://wa.me/2348147831865" target="_blank" class="btn-suggest">
-                    <i class="fab fa-whatsapp"></i> Suggest
-                </a>
-                
-                <!-- Role Switching Button -->
-                <button id="switch-view-btn" class="btn-primary" style="display: none;">Switch Console</button>
-            </div>
-        </header>
-
-        <div class="content">
-            <!-- --- Login Section --- -->
-            <div id="login-section" style="display: none;">
-                <div class="login-box">
-                    <h2>Welcome to Powerful</h2>
-                    <!-- Font size increased by 20% to 1.2em -->
-                    <p id="login-instruction" style="color: var(--color-primary-dark); font-weight: 600; font-size: 1.2em;">
-                        Type in the code/password provided by your content manager.
-                    </p>
-                    <input type="password" id="admin-pass-input" placeholder="Admin Password" style="display: none;">
-                    <input type="password" id="viewer-code-input" placeholder="Access Code" style="display: block;">
-                    
-                    <button class="btn-primary" onclick="attemptLogin()" id="login-button">Login</button>
-                    <p id="login-error" style="color: var(--color-disapproved); margin-top: 15px; display: none; font-weight: 600;">Invalid Code/Password. Please check your credentials.</p>
-                </div>
-            </div>
-
-            <!-- --- Admin Console --- -->
-            <div id="admin-view">
-                <h2>Admin Console: Create, Edit & Monitor</h2>
-                <p style="font-size: 0.8em; color: #888;">Database connected. Posts are permanent.</p>
-                <hr>
-
-                <h3>Create New Post (Publish Post)</h3>
-                <p style="font-size: 0.9em; color: #555;">Use this form to publish new content for your reviewer. Status is automatically set to 'Pending'.</p>
-                <form id="create-post-form">
-                    <label for="post-heading">Heading/Title (Required)</label>
-                    <input type="text" id="post-heading" required>
-                    
-                    <label for="post-text">Post Text/Caption (Required)</label>
-                    <textarea id="post-text" rows="5" required></textarea>
-                    
-                    <label for="post-media-link">Image or Video Link (Optional)</label>
-                    <input type="text" id="post-media-link" placeholder="Enter full URL (e.g., https://placehold.co/800x450/00346e/ffffff?text=Image)">
-                    
-                    <button type="submit" class="btn-primary">Publish Post for Review</button>
-                </form>
-
-                <hr>
-
-                <h3>Manage Viewer Access Code</h3>
-                <div id="manage-access-code" style="padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: white; margin-bottom: 20px;">
-                    <label for="new-viewer-code" style="margin-top: 0;">New Viewer Access Code</label>
-                    <input type="text" id="new-viewer-code" placeholder="Enter new code (e.g., powerfulclient)" style="margin-bottom: 10px;">
-                    <p style="margin: 5px 0 10px 0; font-size: 0.9em; color: #666; font-weight: 600;">
-                        Current Code: <span id="current-viewer-code-display" style="color: var(--color-primary-medium);">Loading...</span>
-                    </p>
-                    <button class="btn-primary" onclick="updateViewerAccessCode()">Update Code</button>
-                </div>
-                
-                <hr>
-
-                <h3>Posts for Client Review</h3>
-                <p style="font-size: 0.9em; color: #555;">Monitor the status and viewer comments here. Rejected posts will clearly show the reason.</p>
-                <ul class="post-list" id="admin-post-list">
-                    <p style="text-align: center; padding: 30px; color: #666; font-style: italic;">Loading posts...</p>
-                </ul>
-            </div>
-
-            <!-- --- Viewer Console --- -->
-            <div id="viewer-view">
-                <p style="font-size: 1.1rem; padding: 15px; background-color: #eaf3ff; border: 2px solid var(--color-primary-light); border-radius: 6px; font-weight: 600;">
-                    **Content Review Instructions:** Click on any post headline to view the full content. Use the **Approve** or **Reject** buttons and add **Comments** to save your final decision for the content manager.
-                </p>
-                
-                <hr>
-
-                <h3>Content Pending/Reviewed</h3>
-                <div id="viewer-post-list">
-                    <p style="text-align: center; padding: 30px; color: #666; font-style: italic;">Loading posts...</p>
-                </div>
-            </div>
+    <!-- ADMIN PANEL -->
+    <section class="card" id="adminPanel">
+      <div class="admin-header">
+        <div>
+          <div style="font-weight:700;font-size:16px;color:var(--brand-1)">Admin console</div>
+          <div class="small">Sign in to manage posts (password required)</div>
         </div>
+        <div class="small">Admin pwd: <strong>powerful</strong></div>
+      </div>
+
+      <div id="adminAuth" style="margin-top:12px">
+        <div class="inline-row">
+          <input type="password" id="adminPwd" placeholder="Enter admin password">
+          <button id="adminLoginBtn">Sign in</button>
+        </div>
+        <div class="small" style="margin-top:8px;color:#7b96b0">After signing in you can create, edit, delete posts and set viewer access code & password.</div>
+      </div>
+
+      <div id="adminPanelArea" style="display:none;margin-top:12px">
+        <div style="display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:start">
+          <div>
+            <label class="small">Post header</label>
+            <input id="postHeader" type="text" placeholder="Short headline or copy">
+            <label class="small" style="margin-top:8px">Body</label>
+            <textarea id="postBody" rows="4" placeholder="Longer post copy / details"></textarea>
+            <label class="small" style="margin-top:8px">Image or video link (embed URL)</label>
+            <input id="postMedia" type="text" placeholder="https://... (image or video)" />
+
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <button id="createPostBtn">Create post</button>
+              <button class="secondary" id="clearFormBtn">Clear</button>
+            </div>
+          </div>
+
+          <div class="card" style="background:#fffefc;padding:12px">
+            <div style="font-weight:700;margin-bottom:8px">Viewer access control</div>
+            <label class="small">Access code (required for viewers)</label>
+            <input id="accessCodeInput" type="text" placeholder="Set code viewers must supply">
+            <div style="margin-top:8px;display:flex;gap:8px"><button id="saveAccessBtn">Save</button><button class="secondary" id="generateCodeBtn">Generate</button></div>
+            <div class="small" style="margin-top:10px;color:#436">Current code: <span id="currentCode">—</span></div>
+          </div>
+        </div>
+
+        <hr style="margin:16px 0;border:none;border-top:1px solid #eef4fb">
+
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:700">Posts</div>
+            <div class="small">You will see approvals and comments here</div>
+          </div>
+          <div id="postsContainer" class="post-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEWER PANEL -->
+    <section class="card" id="viewerPanel" style="display:none;margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:700;font-size:16px;color:var(--brand-1)">Viewer console</div>
+          <div class="small">Sign in with the code provided by your content manager</div>
+        </div>
+        <img src="https://www.powerful.ng/logo_with_black_BG-removebg-preview.png" alt="Powerful" style="height:36px">
+      </div>
+
+      <div id="viewerAuthArea" style="margin-top:12px">
+        <div class="viewer-login">
+          <label class="small">Type in the code password provided by your content manager</label>
+          <input id="viewerCode" type="text" placeholder="Access code">
+          <div style="display:flex;gap:8px"><button id="viewerSignInBtn">Sign in</button><button class="secondary" id="viewerSignOutBtn" style="display:none">Sign out</button></div>
+          <div class="small" style="margin-top:8px;color:#6b7d92">Note: you remain anonymous. Your actions (approve/reject/comments) will be recorded but your identity is not stored.</div>
+        </div>
+      </div>
+
+      <div id="viewerArea" style="display:none;margin-top:12px">
+        <div class="viewer-intro">
+          <div style="font-weight:700">Welcome</div>
+          <div style="margin-top:6px">You can approve, reject and add comments to posts to help us improve. Click any headline to read the full post and respond.</div>
+        </div>
+
+        <div id="viewerPosts" class="post-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal for post view -->
+  <div id="modal" class="modal">
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div id="modalHeader" style="font-weight:700;font-size:18px"></div>
+          <div id="modalSub" class="small" style="margin-top:6px;color:#556">Post details</div>
+        </div>
+        <div><button class="secondary" id="closeModalBtn">Close</button></div>
+      </div>
+
+      <div id="modalBody" style="margin-top:12px"></div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <button id="approveBtn">Approve</button>
+        <button class="secondary" id="rejectBtn">Reject</button>
+        <div style="flex:1"></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <label class="small">Add a short note (optional)</label>
+        <textarea id="modalComment" rows="3" placeholder="Your feedback to the content manager"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px"><button id="sendResponseBtn">Send response</button></div>
+      </div>
     </div>
-    
-    <!-- --- Footer Section --- -->
-    <footer>
-        <div class="footer-content">
-            <div class="social-icons">
-                <a href="https://powerful.ng" target="_blank" title="Website"><i class="fas fa-globe"></i></a>
-                <a href="https://web.facebook.com/profile.php?id=61579604531307" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://x.com/Powerful_HQ" target="_blank" title="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
-                <a href="https://www.youtube.com/@powerful_hq" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-                <a href="https://wa.me/2348147831865" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-            </div>
-            <!-- Copyright year corrected to 2025 -->
-            <div class="copyright">
-                &copy; 2025 Powerful. All Rights Reserved.
-            </div>
-        </div>
-    </footer>
+  </div>
 
+  <script>
+    document.addEventListener('DOMContentLoaded',async ()=>{
+      /* Supabase-backed app (no user auth). */
+      const SUPABASE_URL = 'https://xgdjgxgodwxtpjxkcpaf.supabase.co';
+      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnZGpneGdvZHd4dHBqeGtjcGFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NDMwNTYsImV4cCI6MjA4MDMxOTA1Nn0.lTPmOW2ZxlwSv1yiJkIvdK4bEsWH2dC71bjN7WMbJpM';
+      const { createClient } = supabase;
+      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    <!-- --- Viewer Post Overlay Modal --- -->
-    <div id="post-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('post-modal')">&times;</span>
-            <h2 id="modal-heading"></h2>
-            <p id="modal-text"></p>
-            <img id="modal-media" class="modal-post-media" style="display:none;">
+      const ADMIN_PWD = 'powerful';
 
-            <div class="modal-comment-section">
-                <h4>Your Feedback & Review</h4>
-                <textarea id="modal-comment-box" rows="3" placeholder="Add your comments or notes here..."></textarea>
-                <div class="modal-actions">
-                    <button id="disapprove-btn" class="btn-disapprove" onclick="reviewPost('Disapproved')">🚫 Reject</button>
-                    <button id="approve-btn" class="btn-approve" onclick="reviewPost('Approved')">✅ Approve</button>
-                </div>
-                <p style="margin-top: 10px; font-weight: bold; color: var(--color-primary-dark);">
-                    Current Status: <span id="modal-status"></span>
-                </p>
-                <p style="margin-top: 5px; font-size: 0.9em;">
-                    **Saved Comment:** <span id="modal-saved-comment"></span>
-                </p>
-            </div>
-        </div>
-    </div>
+      // Utilities
+      function qs(id){return document.getElementById(id)}
 
-    <!-- --- Admin Edit Modal --- -->
-    <div id="admin-edit-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('admin-edit-modal')">&times;</span>
-            <h2>Edit Post: <span id="edit-modal-heading-title"></span></h2>
-            <form id="edit-post-form">
-                <input type="hidden" id="edit-post-id">
+      // DOM refs
+      const adminLoginBtn = qs('adminLoginBtn');
+      const adminPwd = qs('adminPwd');
+      const adminPanelArea = qs('adminPanelArea');
+      const postsContainer = qs('postsContainer');
+      const createPostBtn = qs('createPostBtn');
+      const clearFormBtn = qs('clearFormBtn');
+      const postHeader = qs('postHeader');
+      const postBody = qs('postBody');
+      const postMedia = qs('postMedia');
+      const accessCodeInput = qs('accessCodeInput');
+      const saveAccessBtn = qs('saveAccessBtn');
+      const generateCodeBtn = qs('generateCodeBtn');
+      const currentCodeSpan = qs('currentCode');
 
-                <label for="edit-post-heading">Heading/Title</label>
-                <input type="text" id="edit-post-heading" required>
-                
-                <label for="edit-post-text">Post Text/Caption</label>
-                <textarea id="edit-post-text" rows="5" required></textarea>
-                
-                <label for="edit-post-media-link">Image or Video Link</label>
-                <input type="text" id="edit-post-media-link" placeholder="Enter full URL">
-                
-                <p style="margin-top: 15px; font-weight: 600;">Current Status: <span id="edit-modal-status" class="post-status"></span></p>
-                <p style="margin-top: 5px; font-weight: 600;">Viewer Comment: <span id="edit-modal-comment"></span></p>
+      const viewerSignInBtn = qs('viewerSignInBtn');
+      const viewerSignOutBtn = qs('viewerSignOutBtn');
+      const viewerCode = qs('viewerCode');
+      const viewerArea = qs('viewerArea');
+      const viewerPosts = qs('viewerPosts');
+      const viewerAuthArea = qs('viewerAuthArea');
 
-                <div class="modal-actions" style="justify-content: flex-start;">
-                    <button type="button" class="btn-primary" onclick="saveAdminEdit()">Save Changes</button>
-                    <button type="button" class="btn-disapprove" onclick="closeModal('admin-edit-modal')">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
+      const modal = qs('modal');
+      const modalHeader = qs('modalHeader');
+      const modalBody = qs('modalBody');
+      const closeModalBtn = qs('closeModalBtn');
+      const approveBtn = qs('approveBtn');
+      const rejectBtn = qs('rejectBtn');
+      const sendResponseBtn = qs('sendResponseBtn');
+      const modalComment = qs('modalComment');
 
+      const showAdminBtn = qs('showAdminBtn');
+      const showViewerBtn = qs('showViewerBtn');
+      const adminPanel = qs('adminPanel');
+      const viewerPanel = qs('viewerPanel');
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-        import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot, updateDoc, deleteDoc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+      // App state
+      let posts = [];
+      let settings = { accessCode: 'user' };
+      let currentEditId = null;
+      let viewerSession = null; // {anonId, code}
 
-        // --- MANDATORY Firebase Configuration Setup ---
-        
-        // Environment variables are preferred for config in this execution environment
-        // Add this code to read from environment variables:
-const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    // Add other properties if needed
-        let db;
-        let auth;
-        let appInstance;
-        let unsubscribePosts = null; 
-        let currentUserId = null;
-        let globalPosts = []; 
-        let isDataLoaded = false; 
+      // Small helper to show alerts
+      function notify(msg){alert(msg)}
 
-        // Constants using the dynamic appId
-        const ADMIN_PASSWORD = "b4bee53ea9115d2c"; 
-        const VIEWER_CODE_DOC_PATH = `artifacts/${appId}/public/data/config/viewer-code`; 
-        const POSTS_COLLECTION_PATH = `artifacts/${appId}/public/data/posts`; 
-        const COLOR_APPROVED = '#28a745'; 
-        const COLOR_DISAPPROVED = '#dc3545';
-        const COLOR_PENDING = '#ffc107';
+      // Load settings from DB (config table id=1)
+      async function loadSettings(){
+        try{
+          const { data, error } = await sb.from('config').select('viewer_code').eq('id',1).single();
+          if(error && error.code !== 'PGRST116') console.warn('loadSettings error',error);
+          settings.accessCode = data && data.viewer_code ? data.viewer_code : 'user';
+          if(currentCodeSpan) currentCodeSpan.textContent = settings.accessCode;
+        }catch(e){console.error(e)}
+      }
 
-        let currentRole = null;
-        let activePostId = null;
-        let isAuthReady = false;
+      // Save access code to DB
+      async function saveAccess(code){
+        try{
+          const { data, error } = await sb.from('config').upsert({id:1, viewer_code: code}, { returning: 'minimal' });
+          if(error) {console.error('saveAccess error', error); notify('Failed to save access code')}
+          else{ settings.accessCode = code; if(currentCodeSpan) currentCodeSpan.textContent = code; notify('Saved') }
+        }catch(e){console.error(e);notify('Failed to save')}
+      }
 
-        setLogLevel('Debug'); 
+      // Load posts from DB
+      async function loadPosts(){
+        try{
+          const { data, error } = await sb.from('posts').select('*').order('createdAt', { ascending: false });
+          if(error) { console.error('loadPosts error',error); posts = []; return }
+          // Map DB columns to app model
+          posts = (data||[]).map(r=>({ id: r.id, header: r.heading, body: r.text, media: r.medialink, status: r.status, comment: r.comment, createdAt: r.createdAt }));
+        }catch(e){console.error(e);posts=[]}
+      }
 
-        // Initialize Firebase and Authentication
-        async function initializeFirebase() {
-            if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase config is missing or invalid. Cannot connect to database.");
-                document.getElementById('loading-overlay').innerHTML = `
-                    <p class="load-error">FATAL ERROR: Firebase Configuration Missing/Invalid.</p>
-                `;
-                return;
-            }
-            
-            try {
-                // Initialize Firebase with the new config
-                        const app = initializeApp(firebaseConfig);
-                         const db = getFirestore(app);
-                        const auth = getAuth(app);
+      // Create post
+      async function createPost(){
+        const header = (postHeader.value||'').trim();
+        const body = (postBody.value||'').trim();
+        const media = (postMedia.value||'').trim();
+        if(!header || !body){notify('Header and body are required');return}
+        try{
+          const { error } = await sb.from('posts').insert({ heading: header, text: body, medialink: media });
+          if(error) { console.error('createPost error',error); notify('Failed to create post'); return }
+          postHeader.value='';postBody.value='';postMedia.value='';
+          await loadPosts(); renderAdminPosts(); renderViewerList();
+        }catch(e){console.error(e);notify('Failed')}
+      }
 
+      // Update post
+      async function updatePost(id){
+        const header = (postHeader.value||'').trim();
+        const body = (postBody.value||'').trim();
+        const media = (postMedia.value||'').trim();
+        if(!header || !body){notify('Header and body are required');return}
+        try{
+          const { error } = await sb.from('posts').update({ heading: header, text: body, medialink: media }).eq('id', id);
+          if(error){console.error('updatePost error',error);notify('Failed to update');return}
+          currentEditId = null; if(createPostBtn) createPostBtn.textContent='Create post';
+          postHeader.value='';postBody.value='';postMedia.value='';
+          await loadPosts(); renderAdminPosts(); renderViewerList();
+        }catch(e){console.error(e);notify('Failed')}
+      }
 
-                console.log("Firebase App and Services initialized.");
+      // Delete post
+      async function deletePost(id){
+        if(!confirm('Delete this post?')) return;
+        try{
+          const { error } = await sb.from('posts').delete().eq('id', id);
+          if(error){console.error('deletePost error',error);notify('Failed to delete');return}
+          await loadPosts(); renderAdminPosts(); renderViewerList();
+        }catch(e){console.error(e);notify('Failed')}
+      }
 
-                // Perform initial sign-in
-                try {
-                    // New, standard anonymous authentication logic:
-                const auth = getAuth(app);
+      // Admin render
+      function renderAdminPosts(){
+        if(!postsContainer) return;
+        postsContainer.innerHTML='';
+        if(posts.length===0){postsContainer.innerHTML='<div class="small">No posts yet</div>';return}
+        posts.forEach(p=>{
+          const div=document.createElement('div');div.className='post-item';
+          const left=document.createElement('div');
+          left.innerHTML=`<div style="font-weight:700">${escapeHtml(p.header)}</div><div class="small">${escapeHtml((p.body||'')).slice(0,120)}${(p.body||'').length>120?'...':''}</div><div class="small">Status: ${p.status||'Pending'}</div>`;
+          const right=document.createElement('div');
+          const stats=`<div class="small">Comments: ${p.comment ? p.comment.split('\n').length : 0}</div>`;
+          right.innerHTML = stats + '<div style="margin-top:8px;display:flex;gap:6px"><button data-id="'+p.id+'" class="editBtn">Edit</button><button class="secondary" data-id="'+p.id+'">Delete</button></div>';
+          div.appendChild(left);div.appendChild(right);postsContainer.appendChild(div);
+        });
+        // attach handlers
+        postsContainer.querySelectorAll('button[data-id]').forEach(b=>{
+          b.addEventListener('click',()=>{
+            const id = b.getAttribute('data-id');
+            if(b.textContent==='Edit') startEdit(id);
+            else deletePost(id);
+          });
+        });
+      }
 
-                // Use a simple anonymous sign-in or your preferred authentication method.
-            // NOTE: For production, you may want to check if a user is already signed in (using onAuthStateChanged)
-            // before calling signInAnonymously().
-                await signInAnonymously(auth);
-                    }
-                } catch (error) {
-                    console.error("Firebase Initial Sign-In Error:", error);
-                    document.getElementById('loading-overlay').innerHTML = `
-                        <p class="load-error">Authentication Failed: Please check API Key/Permissions.</p>
-                        <p style="font-size: 0.8em; margin-top: 10px;">Error: ${error.code}</p>
-                    `;
-                    return; 
-                }
-                
-                // Wait for auth state change to confirm user and start listeners
-                onAuthStateChanged(auth, (user) => {
-                    if (user && auth.currentUser) {
-                        currentUserId = user.uid;
-                        isAuthReady = true;
-                        console.log("Firebase Auth Ready. User ID:", currentUserId);
-                        
-                        // CRITICAL PERFORMANCE FIX: Start data loading immediately!
-                        startPostsListener();
-                        renderAdminManagement();
-                        
-                        // Now that auth is ready and data is loading, show the login screen.
-                        document.getElementById('login-section').style.display = 'flex';
-                        document.getElementById('loading-overlay').style.display = 'none';
-                        document.getElementById('switch-view-btn').style.display = 'block';
+      // Viewer render
+      function renderViewerList(){
+        if(!viewerPosts) return;
+        viewerPosts.innerHTML='';
+        if(posts.length===0){viewerPosts.innerHTML='<div class="small">No posts available</div>';return}
+        posts.forEach(p=>{
+          const div=document.createElement('div');div.className='post-item';
+          div.innerHTML=`<div style="flex:1"><div class="headline">${escapeHtml(p.header)}</div><div class="small">${escapeHtml((p.body||'')).slice(0,80)}${(p.body||'').length>80?'...':''}</div><div class="small">Status: ${p.status||'Pending'}</div></div>`;
+          div.addEventListener('click',()=>openModal(p.id));
+          viewerPosts.appendChild(div);
+        });
+      }
 
-                    } else {
-                        isAuthReady = true; 
-                        document.getElementById('loading-overlay').textContent = "Authentication Failed. Please retry.";
-                        console.error("Authentication failed: No user found after sign-in attempt.");
-                    }
-                });
+      // Start edit
+      function startEdit(id){
+        const p = posts.find(x=>x.id===id); if(!p) return;
+        postHeader.value = p.header || '';
+        postBody.value = p.body || '';
+        postMedia.value = p.media || '';
+        currentEditId = id; if(createPostBtn) createPostBtn.textContent='Save changes'; window.scrollTo({top:0,behavior:'smooth'});
+      }
 
-            } catch (error) {
-                console.error("Firebase Initialization Error:", error);
-                document.getElementById('loading-overlay').textContent = `ERROR: Failed to initialize Firebase App. ${error.message}`;
-            }
-        }
-        
-        // --- Database CRUD Operations ---
-
-        /**
-         * Real-time listener for all posts. Updates the local cache (globalPosts).
-         * This ensures data permanence across refreshes.
-         */
-        function startPostsListener() {
-            if (!db || unsubscribePosts || !isAuthReady) return; 
-
-            const postsCollection = collection(db, POSTS_COLLECTION_PATH);
-            
-            unsubscribePosts = onSnapshot(postsCollection, (snapshot) => {
-                globalPosts = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                // Sort locally by creation date (newest first)
-                globalPosts.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-                
-                console.log(`[Persistence Check] Posts loaded from Firestore: ${globalPosts.length}`);
-                isDataLoaded = true; 
-
-                // Rerender the current view
-                if (currentRole === 'admin') {
-                    renderAdminPosts();
-                } else if (currentRole === 'viewer') {
-                    renderViewerPosts();
-                }
-            }, (error) => {
-                console.error("Error listening to posts collection (Permission Denied likely):", error);
-                document.getElementById('loading-overlay').innerHTML = `
-                    <p class="load-error">ERROR: Data Load Failed. Check Security Rules (Permission Denied).</p>
-                    <p style="font-size: 0.8em; margin-top: 10px;">Error: ${error.message}</p>
-                `;
-            });
-        }
-        
-        /**
-         * Creates a new post document in Firestore.
-         */
-        async function createPost(postData) {
-            if (!db) return;
-            try {
-                const postsCollection = collection(db, POSTS_COLLECTION_PATH);
-                const docRef = await addDoc(postsCollection, {
-                    ...postData,
-                    createdAt: new Date().toISOString() 
-                });
-                console.log(`[Persistence Check] Post published successfully with ID: ${docRef.id}`);
-                // Clear any previous error messages
-                document.getElementById('login-error').style.display = 'none';
-            } catch (error) {
-                console.error("Error publishing post (WRITE FAILURE):", error);
-                const message = `Error publishing post. Check Firestore console. Error: ${error.message}`;
-                document.getElementById('login-error').textContent = message;
-                document.getElementById('login-error').style.display = 'block';
-            }
-        }
-
-        /**
-         * Updates a post document in Firestore.
-         */
-        async function updatePost(postId, data) {
-            if (!db || !postId) return;
-            try {
-                const postDoc = doc(db, POSTS_COLLECTION_PATH, postId);
-                await updateDoc(postDoc, data);
-                console.log(`Post ${postId} updated successfully.`);
-            } catch (error) {
-                console.error(`Error updating post ${postId}:`, error);
-                const message = `Error updating post: ${error.message}`;
-                document.getElementById('login-error').textContent = message;
-                document.getElementById('login-error').style.display = 'block';
-            }
-        }
-
-        /**
-         * Deletes a post document from Firestore.
-         * Posts remain permanent until this function is executed by the Admin.
-         */
-        async function deletePostFromDB(postId) {
-            if (!db || !postId) return;
-            try {
-                const postDoc = doc(db, POSTS_COLLECTION_PATH, postId);
-                await deleteDoc(postDoc);
-                console.log(`[Persistence Check] Post ${postId} deleted successfully by Admin.`);
-            } catch (error) {
-                console.error(`Deletion of post ${postId} failed.`);
-                console.error(`POSSIBLE SECURITY RULE ERROR: ${error.message}`); 
-                document.getElementById('login-error').textContent = `Error deleting post. Check console for "Permission Denied" errors.`;
-                document.getElementById('login-error').style.display = 'block';
-            }
-        }
-
-        // --- Viewer Access Code Management (Stored in Firestore) ---
-
-        /**
-         * Fetches the Viewer Access Code from Firestore or creates a default if missing.
-         */
-        async function getViewerAccessCode() {
-            if (!db) return 'user'; 
-            try {
-                const codeDoc = doc(db, VIEWER_CODE_DOC_PATH);
-                const docSnap = await getDoc(codeDoc);
-
-                if (docSnap.exists() && docSnap.data().code) {
-                    return docSnap.data().code;
-                } else {
-                    const defaultCode = 'user';
-                    await setDoc(codeDoc, { code: defaultCode }, { merge: true });
-                    return defaultCode;
-                }
-            } catch (e) {
-                console.error("Error fetching viewer code:", e);
-                return 'user'; 
-            }
-        }
-
-        /**
-         * Updates the Viewer Access Code in Firestore.
-         */
-        async function updateViewerAccessCode() {
-            if (!db) return;
-
-            const newCodeInput = document.getElementById('new-viewer-code');
-            const newCode = newCodeInput.value.trim();
-
-            if (newCode.length < 4) {
-                console.warn('Access Code must be at least 4 characters long.');
-                return;
-            }
-
-            try {
-                const codeDoc = doc(db, VIEWER_CODE_DOC_PATH);
-                await setDoc(codeDoc, { code: newCode });
-                newCodeInput.value = '';
-                renderAdminManagement();
-                console.log(`Viewer Access Code successfully updated to: ${newCode}`);
-            } catch (e) {
-                console.error("Error updating viewer code:", e);
-                console.error(`Error updating viewer code: ${e.message}`);
-            }
-        }
-        window.updateViewerAccessCode = updateViewerAccessCode;
-
-
-        // Render admin management section
-        async function renderAdminManagement() {
-            const currentCode = await getViewerAccessCode();
-            const displayEl = document.getElementById('current-viewer-code-display');
-            if (displayEl) {
-                displayEl.textContent = currentCode;
-            }
-        }
-        
-        // --- Core Application State & UI Management ---
-
-        function showView(role) {
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('admin-view').style.display = 'none';
-            document.getElementById('viewer-view').style.display = 'none';
-            currentRole = role;
-
-            if (role === 'admin') {
-                document.getElementById('admin-view').style.display = 'block';
-                document.getElementById('switch-view-btn').textContent = 'Go to Viewer Console';
-                renderAdminPosts();
-            } else if (role === 'viewer') {
-                document.getElementById('viewer-view').style.display = 'block';
-                document.getElementById('switch-view-btn').textContent = 'Go to Admin Console';
-                renderViewerPosts();
-            }
-        }
-
-        async function attemptLogin() {
-            if (!isAuthReady || !isDataLoaded) {
-                document.getElementById('login-error').textContent = "Data is still loading. Please wait a moment.";
-                document.getElementById('login-error').style.display = 'block';
-                return;
-            }
-            
-            const adminPassInput = document.getElementById('admin-pass-input');
-            const viewerCodeInput = document.getElementById('viewer-code-input');
-            const loginError = document.getElementById('login-error');
-            loginError.style.display = 'none'; 
-
-            const isViewerLoginAttempt = viewerCodeInput.style.display !== 'none';
-            
-            let authenticated = false;
-            let role = null;
-            let attemptedPass = isViewerLoginAttempt ? viewerCodeInput.value.trim() : adminPassInput.value.trim();
-
-            const currentViewerCode = await getViewerAccessCode(); 
-            const currentAdminPass = ADMIN_PASSWORD; 
-
-            if (isViewerLoginAttempt && attemptedPass === currentViewerCode) {
-                authenticated = true;
-                role = 'viewer';
-            } else if (!isViewerLoginAttempt && attemptedPass === currentAdminPass) {
-                authenticated = true;
-                role = 'admin';
-            }
-
-            if (authenticated) {
-                showView(role);
+      // Modal open
+      function openModal(id){
+        const p = posts.find(x=>x.id===id); if(!p) return;
+        if(modalHeader) modalHeader.textContent = p.header;
+        if(modalBody) {
+          modalBody.innerHTML = `<div style="white-space:pre-line">${escapeHtml(p.body||'')}</div>`;
+          if(p.media){
+            if(p.media.match(/\.(jpg|jpeg|png|gif|webp)$/i) || p.media.includes('image')){
+              modalBody.innerHTML += `<img src="${escapeHtmlAttr(p.media)}" class="media">`;
             } else {
-                loginError.textContent = "Invalid Code/Password. Please check your credentials.";
-                loginError.style.display = 'block';
+              modalBody.innerHTML += `<div style="margin-top:10px"><a href="${escapeHtmlAttr(p.media)}" target="_blank">Open media</a></div>`;
             }
+          }
+          modalBody.innerHTML += `<div style="margin-top:10px" class="small">Status: ${p.status||'Pending'}</div>`;
+          modalBody.innerHTML += `<div style="margin-top:8px" class="small">${escapeHtml(p.comment||'')}</div>`;
         }
-        window.attemptLogin = attemptLogin;
-        
-        window.onload = function() {
-            // Initiate Firebase Initialization and Authentication immediately
-            initializeFirebase(); 
+        if(modal){ modal.dataset.postId = id; modal.classList.add('open'); }
+      }
+      if(closeModalBtn) closeModalBtn.addEventListener('click',()=>{ if(modal) modal.classList.remove('open'); if(modalComment) modalComment.value=''; });
 
-            const switchBtn = document.getElementById('switch-view-btn');
-            const loginInstruction = document.getElementById('login-instruction');
-            const adminPassInput = document.getElementById('admin-pass-input');
-            const viewerCodeInput = document.getElementById('viewer-code-input');
-            
-            // Set initial state to Viewer Login
-            viewerCodeInput.style.display = 'block';
-            adminPassInput.style.display = 'none';
-            switchBtn.textContent = 'Admin Login'; 
+      // Record response: set status and append comment to comment field
+      async function recordResponse(action){
+        const id = modal && modal.dataset.postId; const p = posts.find(x=>x.id===id); if(!p) return;
+        if(!viewerSession){notify('You must sign in as a viewer to respond');return}
+        const note = (modalComment && modalComment.value.trim()) || '';
+        const newStatus = action==='approve' ? 'Approved' : (action==='reject' ? 'Disapproved' : p.status || 'Pending');
+        const time = new Date().toISOString();
+        const entry = `${time} | ${viewerSession.anonId} | ${action} | ${note}`;
+        const combined = (p.comment ? p.comment + '\n' : '') + entry;
+        try{
+          const { error } = await sb.from('posts').update({ status: newStatus, comment: combined }).eq('id', id);
+          if(error){console.error('recordResponse error',error);notify('Failed to save response');return}
+          await loadPosts(); renderAdminPosts(); renderViewerList(); if(modal) modal.classList.remove('open'); if(modalComment) modalComment.value=''; notify('Response recorded');
+        }catch(e){console.error(e);notify('Failed')}
+      }
 
+      if(approveBtn) approveBtn.addEventListener('click',()=>recordResponse('approve'));
+      if(rejectBtn) rejectBtn.addEventListener('click',()=>recordResponse('reject'));
+      if(sendResponseBtn) sendResponseBtn.addEventListener('click',()=>recordResponse('comment'));
 
-            switchBtn.onclick = () => {
-                // Toggle login mode
-                const isViewingAdmin = adminPassInput.style.display === 'block';
+      // Admin login
+      if(adminLoginBtn) adminLoginBtn.addEventListener('click',async ()=>{
+        if(adminPwd.value===ADMIN_PWD){
+          qs('adminAuth').style.display='none'; adminPanelArea.style.display='block';
+          await loadSettings(); await loadPosts(); renderAdminPosts(); renderViewerList();
+        } else notify('Invalid admin password');
+      });
 
-                if (isViewingAdmin) {
-                    viewerCodeInput.style.display = 'block';
-                    adminPassInput.style.display = 'none';
-                    viewerCodeInput.value = '';
-                    loginInstruction.textContent = 'Type in the code/password provided by your content manager.';
-                    switchBtn.textContent = 'Admin Login';
-                } 
-                else {
-                    viewerCodeInput.style.display = 'none';
-                    adminPassInput.style.display = 'block';
-                    adminPassInput.value = '';
-                    loginInstruction.textContent = 'Please enter the Admin Password.';
-                    switchBtn.textContent = 'Viewer Login';
-                }
-                document.getElementById('login-error').style.display = 'none';
-            };
-            
-            document.getElementById('create-post-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const heading = document.getElementById('post-heading').value.trim();
-                const text = document.getElementById('post-text').value.trim();
-                const mediaLink = document.getElementById('post-media-link').value.trim();
+      // Create / update post
+      if(createPostBtn) createPostBtn.addEventListener('click',async ()=>{
+        if(currentEditId) await updatePost(currentEditId); else await createPost();
+      });
+      if(clearFormBtn) clearFormBtn.addEventListener('click',()=>{ postHeader.value=''; postBody.value=''; postMedia.value=''; currentEditId=null; if(createPostBtn) createPostBtn.textContent='Create post'; });
 
-                if (!heading || !text) {
-                    console.error('Heading and Post Text are required.');
-                    return;
-                }
+      // Access code control
+      if(saveAccessBtn) saveAccessBtn.addEventListener('click',()=>{ const code = (accessCodeInput.value||'').trim(); if(!code) return notify('Access code cannot be empty'); saveAccess(code); });
+      if(generateCodeBtn) generateCodeBtn.addEventListener('click',()=>{ const code = 'P-'+Math.random().toString(36).slice(2,8).toUpperCase(); accessCodeInput.value = code; });
 
-                const newPost = {
-                    heading: heading,
-                    text: text,
-                    mediaLink: mediaLink,
-                    status: 'Pending',
-                    comment: '' 
-                };
-                
-                // This ensures the post is saved permanently to Firestore.
-                createPost(newPost);
-                
-                this.reset();
-            });
+      // Viewer sign in (only access code required)
+      if(viewerSignInBtn) viewerSignInBtn.addEventListener('click',async ()=>{
+        const code = (viewerCode.value||'').trim();
+        await loadSettings();
+        if(!settings.accessCode){notify('No access code set by admin');return}
+        if(code !== settings.accessCode){notify('Invalid code');return}
+        viewerSession = { code, anonId: 'anon-'+Math.random().toString(36).slice(2,9) };
+        if(viewerAuthArea) viewerAuthArea.style.display='none'; if(viewerArea) viewerArea.style.display='block'; if(viewerSignOutBtn) viewerSignOutBtn.style.display='inline-block';
+        await loadPosts(); renderViewerList();
+      });
+      if(viewerSignOutBtn) viewerSignOutBtn.addEventListener('click',()=>{ viewerSession=null; if(viewerAuthArea) viewerAuthArea.style.display='block'; if(viewerArea) viewerArea.style.display='none'; if(viewerSignOutBtn) viewerSignOutBtn.style.display='none'; if(viewerCode) viewerCode.value=''; });
 
-            window.onclick = function(event) {
-                const postModal = document.getElementById('post-modal');
-                const editModal = document.getElementById('admin-edit-modal');
-                if (event.target === postModal) {
-                    closeModal('post-modal');
-                } else if (event.target === editModal) {
-                    closeModal('admin-edit-modal');
-                }
-            }
-        };
+      // UI toggle
+      if(showAdminBtn) showAdminBtn.addEventListener('click',()=>{ adminPanel.style.display='block'; viewerPanel.style.display='none'; });
+      if(showViewerBtn) showViewerBtn.addEventListener('click',()=>{ adminPanel.style.display='none'; viewerPanel.style.display='block'; });
 
+      // Initial load
+      await loadSettings(); await loadPosts(); renderAdminPosts(); renderViewerList();
 
-        // --- Admin Console: Render, Edit, Delete Logic (Exported for HTML) ---
+      // Admin double-click for details
+      if(postsContainer) postsContainer.addEventListener('dblclick',e=>{
+        const item = e.target.closest('.post-item'); if(!item) return; const header = item.querySelector('div').innerText.split('\n')[0]; const p = posts.find(x=>x.header===header); if(p){ const comments = (p.comment||'').split('\n').join('\n'); alert(`Post: ${p.header}\n\nBody:\n${p.body}\n\nStatus: ${p.status||'Pending'}\n\nComments:\n${comments||'No comments'}`); }
+      });
 
-        function deletePost(id) {
-            console.log(`Admin deleting post ID: ${id}. Post will be permanently removed.`);
-            deletePostFromDB(id);
-        }
-        window.deletePost = deletePost; 
+      // Helpers
+      function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+      function escapeHtmlAttr(s){return String(s||'').replace(/"/g,'%22').replace(/'/g,'%27');}
 
-        function openAdminEditModal(id) {
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
-
-            activePostId = id;
-            
-            document.getElementById('edit-post-id').value = post.id;
-            document.getElementById('edit-modal-heading-title').textContent = post.heading;
-            document.getElementById('edit-post-heading').value = post.heading;
-            document.getElementById('edit-post-text').value = post.text;
-            document.getElementById('edit-post-media-link').value = post.mediaLink;
-            
-            const statusEl = document.getElementById('edit-modal-status');
-            statusEl.textContent = post.status;
-            statusEl.className = `post-status status-${post.status}`;
-            document.getElementById('edit-modal-comment').textContent = post.comment || 'N/A';
-            
-            document.getElementById('admin-edit-modal').style.display = 'block';
-        }
-        window.openAdminEditModal = openAdminEditModal; 
-
-        function saveAdminEdit() {
-            const id = document.getElementById('edit-post-id').value;
-            const heading = document.getElementById('edit-post-heading').value.trim();
-            const text = document.getElementById('edit-post-text').value.trim();
-            const mediaLink = document.getElementById('edit-post-media-link').value.trim();
-            
-            if (!heading || !text) {
-                console.error('Heading and Post Text are required.'); 
-                return;
-            }
-
-            const dataToUpdate = {
-                heading: heading,
-                text: text,
-                mediaLink: mediaLink,
-                status: 'Pending', // Editing resets status for re-review
-                comment: '' 
-            };
-            
-            updatePost(id, dataToUpdate).then(() => {
-                closeModal('admin-edit-modal');
-                console.log(`Post "${heading}" updated successfully. Status reset to Pending.`);
-            });
-        }
-        window.saveAdminEdit = saveAdminEdit; 
-
-
-        // --- Admin Console: Rendering ---
-        function renderAdminPosts() {
-            const postList = document.getElementById('admin-post-list');
-            postList.innerHTML = '';
-            const posts = globalPosts; 
-
-            if (posts.length === 0) {
-                 postList.innerHTML = '<p style="text-align: center; padding: 30px; color: #666; font-style: italic;">No posts created yet. Use the "Create New Post" form above to publish content for review.</p>';
-                 return;
-            }
-
-            posts.forEach(post => {
-                const li = document.createElement('li');
-                li.className = 'post-item';
-                
-                const summaryText = post.text.length > 70 ? post.text.substring(0, 70) + '...' : post.text;
-                const viewerComment = post.comment || 'None';
-
-                li.innerHTML = `
-                    <div class="post-details">
-                        <strong>${post.heading}</strong>
-                        <p style="margin: 3px 0; font-size: 0.9em; color: #555;">${summaryText}</p>
-                        <small style="color: var(--color-primary-medium); font-style: italic; font-weight: 600;">Viewer Comment: ${viewerComment}</small>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <span class="post-status status-${post.status}">${post.status}</span>
-                        <div class="admin-actions">
-                            <button class="btn-edit" onclick="openAdminEditModal('${post.id}')">✏️ Edit</button>
-                            <button class="btn-disapprove" style="background-color: #f44336;" onclick="deletePost('${post.id}')">🗑️ Delete</button>
-                        </div>
-                    </div>
-                `;
-                postList.appendChild(li);
-            });
-        }
-
-
-        // --- Viewer Console: Rendering & Review Logic ---
-        function renderViewerPosts() {
-            const postListDiv = document.getElementById('viewer-post-list');
-            postListDiv.innerHTML = '';
-            const posts = globalPosts;
-
-            if (posts.length === 0) {
-                 postListDiv.innerHTML = '<p style="text-align: center; padding: 30px; color: #666; font-style: italic;">No content currently available for review. Please wait for the content manager to publish a post.</p>';
-                 return;
-            }
-
-            posts.forEach(post => {
-                const div = document.createElement('div');
-                div.className = 'viewer-post-summary';
-                div.setAttribute('data-id', post.id);
-                div.onclick = () => openPostModal(post.id);
-
-                let summaryText = post.text.substring(0, 100);
-                if (post.text.length > 100) summaryText += '...';
-
-                const statusColor = post.status === 'Approved' ? COLOR_APPROVED : post.status === 'Disapproved' ? COLOR_DISAPPROVED : COLOR_PENDING;
-
-                div.innerHTML = `
-                    <h3>${post.heading}</h3>
-                    <p>${summaryText}</p>
-                    <p style="margin-top: 10px; font-weight: bold; font-size: 0.9em;">Status: 
-                        <span style="color: ${statusColor}; font-weight: 700;">${post.status}</span>
-                    </p>
-                `;
-                postListDiv.appendChild(div);
-            });
-        }
-
-        // --- Modal Logic (Exported for HTML) ---
-        function openPostModal(id) {
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
-
-            activePostId = id;
-
-            document.getElementById('modal-heading').textContent = post.heading;
-            document.getElementById('modal-text').textContent = post.text;
-            
-            const statusEl = document.getElementById('modal-status');
-            statusEl.textContent = post.status;
-            
-            statusEl.style.color = post.status === 'Approved' ? COLOR_APPROVED : post.status === 'Disapproved' ? COLOR_DISAPPROVED : COLOR_PENDING;
-
-            const mediaEl = document.getElementById('modal-media');
-            if (post.mediaLink) {
-                // Image fallback for public images
-                mediaEl.onerror = () => { mediaEl.src = `https://placehold.co/800x450/cccccc/333333?text=Media+Unavailable`; };
-                mediaEl.src = post.mediaLink;
-                mediaEl.style.display = 'block';
-            } else {
-                mediaEl.style.display = 'none';
-            }
-
-            document.getElementById('modal-comment-box').value = post.comment || '';
-            document.getElementById('modal-saved-comment').textContent = post.comment || 'No comment yet.';
-
-            document.getElementById('post-modal').style.display = 'block';
-        }
-        window.openPostModal = openPostModal; 
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            activePostId = null;
-            if (currentRole === 'viewer') {
-                renderViewerPosts();
-            } else if (currentRole === 'admin') {
-                renderAdminPosts();
-            }
-        }
-        window.closeModal = closeModal; 
-
-        function reviewPost(status) {
-            if (!activePostId) return;
-
-            const comment = document.getElementById('modal-comment-box').value.trim();
-            
-            const dataToUpdate = {
-                status: status,
-                comment: comment
-            };
-            
-            updatePost(activePostId, dataToUpdate).then(() => {
-                // Optimistically update modal display
-                document.getElementById('modal-status').textContent = status;
-                document.getElementById('modal-status').style.color = status === 'Approved' ? COLOR_APPROVED : status === 'Disapproved' ? COLOR_DISAPPROVED : COLOR_PENDING;
-                document.getElementById('modal-saved-comment').textContent = comment || 'No comment yet.';
-
-                console.log(`Review submitted! Post is marked as ${status}. Comment saved.`);
-            });
-        }
-        window.reviewPost = reviewPost; 
-
-    </script>
+    });
+  </script>
 </body>
 </html>
