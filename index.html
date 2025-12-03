@@ -608,10 +608,15 @@
         // --- MANDATORY Firebase Configuration Setup ---
         
         // Environment variables are preferred for config in this execution environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-
+        // Add this code to read from environment variables:
+const firebaseConfig = {
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    // Add other properties if needed
         let db;
         let auth;
         let appInstance;
@@ -645,18 +650,23 @@
             }
             
             try {
-                appInstance = initializeApp(firebaseConfig);
-                auth = getAuth(appInstance);
-                db = getFirestore(appInstance);
+                // Initialize Firebase with the new config
+                        const app = initializeApp(firebaseConfig);
+                         const db = getFirestore(app);
+                        const auth = getAuth(app);
+
 
                 console.log("Firebase App and Services initialized.");
 
                 // Perform initial sign-in
                 try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
+                    // New, standard anonymous authentication logic:
+                const auth = getAuth(app);
+
+                // Use a simple anonymous sign-in or your preferred authentication method.
+            // NOTE: For production, you may want to check if a user is already signed in (using onAuthStateChanged)
+            // before calling signInAnonymously().
+                await signInAnonymously(auth);
                     }
                 } catch (error) {
                     console.error("Firebase Initial Sign-In Error:", error);
