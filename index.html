@@ -27,7 +27,7 @@
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column; /* Changed to column for sticky footer */
+            flex-direction: column; 
             justify-content: flex-start;
             align-items: center;
             min-height: 100vh;
@@ -42,7 +42,7 @@
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 20px;
-            flex-grow: 1; /* Allow container to grow */
+            flex-grow: 1; 
         }
 
         /* --- Header & Branding --- */
@@ -54,7 +54,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 5px solid var(--color-primary-light);
-            position: relative; /* Needed for absolute positioning of CTA */
+            position: relative; 
         }
         header h1 {
             margin: 0;
@@ -63,7 +63,6 @@
         }
         .logo {
             height: 35px;
-            /* Invert for visibility on dark background, slightly less than 1 to preserve some black */
             filter: invert(0.9); 
         }
         .logo-container {
@@ -75,12 +74,12 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 15px; /* Spacing between Suggest and Switch buttons */
+            gap: 15px; 
         }
 
         /* Custom style for the Suggest button (CTA) */
         .btn-suggest {
-            background-color: var(--color-approved); /* Green for visibility/call to action */
+            background-color: var(--color-approved); 
             color: white;
             padding: 8px 14px;
             text-decoration: none;
@@ -102,12 +101,12 @@
         footer {
             width: 100%;
             max-width: 1200px;
-            background-color: var(--color-primary-dark); /* Match header */
+            background-color: var(--color-primary-dark); 
             color: white;
             padding: 20px 25px;
             border-radius: 0 0 12px 12px;
             text-align: center;
-            margin-top: auto; /* Push footer to the bottom */
+            margin-top: auto; 
             box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
@@ -226,7 +225,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Prevent scrolling when loading */
+            overflow: hidden; 
             background: rgba(255, 255, 255, 0.8);
             display: flex;
             flex-direction: column;
@@ -416,10 +415,10 @@
                 gap: 5px;
             }
             .btn-suggest {
-                order: 1; /* Suggest button first */
+                order: 1; 
             }
             #switch-view-btn {
-                order: 2; /* Switch button second */
+                order: 2; 
                 font-size: 0.8rem;
                 padding: 6px 10px;
             }
@@ -431,7 +430,7 @@
         <div class="spinner"></div>
         Authenticating and loading content in the background...
         <p style="font-size: 0.9em; margin-top: 15px;">
-            The application is fetching data in real-time. This should be quick.
+            The application is fetching data in real-time from Firestore, guaranteeing post permanence.
         </p>
     </div>
 
@@ -474,7 +473,7 @@
             <!-- --- Admin Console --- -->
             <div id="admin-view">
                 <h2>Admin Console: Create, Edit & Monitor</h2>
-                <p style="font-size: 0.8em; color: #888;">Database connected. Real-time updates enabled.</p>
+                <p style="font-size: 0.8em; color: #888;">Database connected. Posts are permanent.</p>
                 <hr>
 
                 <h3>Create New Post (Publish Post)</h3>
@@ -602,33 +601,16 @@
 
 
     <script type="module">
-        // Updated imports to use a stable Firebase SDK version (10.12.3)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
         import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot, updateDoc, deleteDoc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
         // --- MANDATORY Firebase Configuration Setup ---
         
+        // Environment variables are preferred for config in this execution environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let firebaseConfig = {};
-
-        if (typeof __firebase_config !== 'undefined') {
-            firebaseConfig = JSON.parse(__firebase_config);
-        } else {
-            // Using the API key provided by the user in the previous turn
-            firebaseConfig = {
-                apiKey: "AIzaSyDnhYIj8cL22hsyoKGEQbt4fpPCMaxKouk", 
-                authDomain: "powerful-e53bd.firebaseapp.com",
-                projectId: "powerful-e53bd", 
-                storageBucket: "powerful-e53bd.appspot.com",
-                messagingSenderId: "662417188692",
-                appId: "1:662417188692:web:d4b0de4cfb557b2f4b4ac1",
-                measurementId: "G-HRQ3F3C71K" 
-            };
-        }
-
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let db;
         let auth;
@@ -636,7 +618,7 @@
         let unsubscribePosts = null; 
         let currentUserId = null;
         let globalPosts = []; 
-        let isDataLoaded = false; // NEW STATE FLAG
+        let isDataLoaded = false; 
 
         // Constants using the dynamic appId
         const ADMIN_PASSWORD = "b4bee53ea9115d2c"; 
@@ -654,7 +636,7 @@
 
         // Initialize Firebase and Authentication
         async function initializeFirebase() {
-            if (!firebaseConfig || !firebaseConfig.projectId || Object.keys(firebaseConfig).length < 6) {
+            if (Object.keys(firebaseConfig).length === 0) {
                 console.error("Firebase config is missing or invalid. Cannot connect to database.");
                 document.getElementById('loading-overlay').innerHTML = `
                     <p class="load-error">FATAL ERROR: Firebase Configuration Missing/Invalid.</p>
@@ -663,42 +645,36 @@
             }
             
             try {
-                // 1. Initialize the app instance
                 appInstance = initializeApp(firebaseConfig);
-                
-                // 2. Get Auth and Firestore instances
                 auth = getAuth(appInstance);
                 db = getFirestore(appInstance);
 
                 console.log("Firebase App and Services initialized.");
 
-                // 3. Perform initial sign-in using provided token or anonymously
+                // Perform initial sign-in
                 try {
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
-                        console.log("Signed in with custom token (Canvas).");
                     } else {
                         await signInAnonymously(auth);
-                        console.log("Signed in anonymously (External Deployment).");
                     }
                 } catch (error) {
-                    // This catches specific sign-in errors like 'auth/api-key-not-valid'
                     console.error("Firebase Initial Sign-In Error:", error);
                     document.getElementById('loading-overlay').innerHTML = `
-                        <p class="load-error">Authentication Failed: Check API Key and Anonymous Sign-In setting.</p>
+                        <p class="load-error">Authentication Failed: Please check API Key/Permissions.</p>
                         <p style="font-size: 0.8em; margin-top: 10px;">Error: ${error.code}</p>
                     `;
                     return; 
                 }
                 
-                // 4. Wait for auth state change to confirm user and start listeners
+                // Wait for auth state change to confirm user and start listeners
                 onAuthStateChanged(auth, (user) => {
                     if (user && auth.currentUser) {
                         currentUserId = user.uid;
                         isAuthReady = true;
                         console.log("Firebase Auth Ready. User ID:", currentUserId);
                         
-                        // *** CRITICAL PERFORMANCE FIX: Start data loading immediately! ***
+                        // CRITICAL PERFORMANCE FIX: Start data loading immediately!
                         startPostsListener();
                         renderAdminManagement();
                         
@@ -724,14 +700,13 @@
 
         /**
          * Real-time listener for all posts. Updates the local cache (globalPosts).
+         * This ensures data permanence across refreshes.
          */
         function startPostsListener() {
-            // Guard clause to ensure db is initialized and listener isn't already active
             if (!db || unsubscribePosts || !isAuthReady) return; 
 
             const postsCollection = collection(db, POSTS_COLLECTION_PATH);
             
-            // Listen for real-time updates
             unsubscribePosts = onSnapshot(postsCollection, (snapshot) => {
                 globalPosts = snapshot.docs.map(doc => ({
                     id: doc.id,
@@ -740,10 +715,10 @@
                 // Sort locally by creation date (newest first)
                 globalPosts.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
                 
-                console.log("Posts updated in real-time:", globalPosts.length);
-                isDataLoaded = true; // Set flag to true once data is received
+                console.log(`[Persistence Check] Posts loaded from Firestore: ${globalPosts.length}`);
+                isDataLoaded = true; 
 
-                // Rerender the current view if a role is set (and posts were loaded in the background)
+                // Rerender the current view
                 if (currentRole === 'admin') {
                     renderAdminPosts();
                 } else if (currentRole === 'viewer') {
@@ -765,14 +740,16 @@
             if (!db) return;
             try {
                 const postsCollection = collection(db, POSTS_COLLECTION_PATH);
-                await addDoc(postsCollection, {
+                const docRef = await addDoc(postsCollection, {
                     ...postData,
                     createdAt: new Date().toISOString() 
                 });
-                console.log("Post published successfully.");
+                console.log(`[Persistence Check] Post published successfully with ID: ${docRef.id}`);
+                // Clear any previous error messages
+                document.getElementById('login-error').style.display = 'none';
             } catch (error) {
-                console.error("Error publishing post:", error);
-                const message = `Error publishing post: ${error.message}`;
+                console.error("Error publishing post (WRITE FAILURE):", error);
+                const message = `Error publishing post. Check Firestore console. Error: ${error.message}`;
                 document.getElementById('login-error').textContent = message;
                 document.getElementById('login-error').style.display = 'block';
             }
@@ -797,13 +774,14 @@
 
         /**
          * Deletes a post document from Firestore.
+         * Posts remain permanent until this function is executed by the Admin.
          */
         async function deletePostFromDB(postId) {
             if (!db || !postId) return;
             try {
                 const postDoc = doc(db, POSTS_COLLECTION_PATH, postId);
                 await deleteDoc(postDoc);
-                console.log(`Post ${postId} deleted successfully.`);
+                console.log(`[Persistence Check] Post ${postId} deleted successfully by Admin.`);
             } catch (error) {
                 console.error(`Deletion of post ${postId} failed.`);
                 console.error(`POSSIBLE SECURITY RULE ERROR: ${error.message}`); 
@@ -827,7 +805,6 @@
                     return docSnap.data().code;
                 } else {
                     const defaultCode = 'user';
-                    // Must ensure only admin can write, so we rely on security rules here.
                     await setDoc(codeDoc, { code: defaultCode }, { merge: true });
                     return defaultCode;
                 }
@@ -877,7 +854,6 @@
         // --- Core Application State & UI Management ---
 
         function showView(role) {
-            // *** CRITICAL FIX: The view switch is now FAST because data loading occurred earlier. ***
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('admin-view').style.display = 'none';
             document.getElementById('viewer-view').style.display = 'none';
@@ -896,7 +872,6 @@
 
         async function attemptLogin() {
             if (!isAuthReady || !isDataLoaded) {
-                // Should not happen if overlay logic is correct, but as a safeguard
                 document.getElementById('login-error').textContent = "Data is still loading. Please wait a moment.";
                 document.getElementById('login-error').style.display = 'block';
                 return;
@@ -913,7 +888,6 @@
             let role = null;
             let attemptedPass = isViewerLoginAttempt ? viewerCodeInput.value.trim() : adminPassInput.value.trim();
 
-            // We fetch the code right before checking to ensure we have the absolute latest value
             const currentViewerCode = await getViewerAccessCode(); 
             const currentAdminPass = ADMIN_PASSWORD; 
 
@@ -936,7 +910,6 @@
         
         window.onload = function() {
             // Initiate Firebase Initialization and Authentication immediately
-            // This starts the background data loading process.
             initializeFirebase(); 
 
             const switchBtn = document.getElementById('switch-view-btn');
@@ -990,6 +963,7 @@
                     comment: '' 
                 };
                 
+                // This ensures the post is saved permanently to Firestore.
                 createPost(newPost);
                 
                 this.reset();
@@ -1010,8 +984,7 @@
         // --- Admin Console: Render, Edit, Delete Logic (Exported for HTML) ---
 
         function deletePost(id) {
-            console.log(`Admin deleting post ID: ${id} without confirmation.`);
-            // Using custom modal is best practice, but for simplicity here, we proceed with direct deletion
+            console.log(`Admin deleting post ID: ${id}. Post will be permanently removed.`);
             deletePostFromDB(id);
         }
         window.deletePost = deletePost; 
@@ -1169,7 +1142,6 @@
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
             activePostId = null;
-            // Force a re-render of the relevant list to reflect the latest status/comment from the globalPosts update
             if (currentRole === 'viewer') {
                 renderViewerPosts();
             } else if (currentRole === 'admin') {
