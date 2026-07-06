@@ -1,445 +1,314 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Powerful — Content Approval (Supabase)</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
-  <style>
-    /* Brand colors: #00346e, #00418b, #006fc6, #fdf9f3 */
-    :root{
-      --brand-1:#00346e;
-      --brand-2:#00418b;
-      --brand-3:#006fc6;
-      --bg:#fdf9f3;
-      --glass: rgba(255,255,255,0.85);
-      --radius:12px;
-      --frutiger: 'Frutiger', 'Frutiger Linotype', 'Helvetica Neue', Arial, sans-serif;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#ffffff);font-family:var(--frutiger);color:#052036}
-    header{display:flex;align-items:center;gap:16px;padding:18px;border-bottom:1px solid rgba(0,0,0,0.06);background:white}
-    header img{height:48px}
-    .wrap{max-width:1100px;margin:24px auto;padding:18px}
-
-    /* Card */
-    .card{background:var(--glass);padding:16px;border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,0.06)}
-
-    /* Controls */
-    .top-controls{display:flex;gap:8px;margin-bottom:12px}
-    .inline-row{display:flex;gap:8px}
-    input, textarea, button, select{font-family:var(--frutiger);font-size:14px}
-    input[type=text], input[type=password], textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #d7e6f6}
-    button{padding:10px 14px;border-radius:8px;border:0;background:var(--brand-2);color:white;cursor:pointer}
-    button.secondary{background:transparent;color:var(--brand-2);border:1px solid var(--brand-2)}
-
-    /* Admin console */
-    .admin-header{display:flex;justify-content:space-between;align-items:center}
-    .post-list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
-    .post-item{padding:10px;border-radius:10px;background:white;border:1px solid rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center}
-    .small{font-size:13px;color:#4a6b89}
-
-    /* Viewer UI */
-    .viewer-login{display:flex;flex-direction:column;gap:8px}
-    .viewer-intro{background:linear-gradient(90deg,var(--brand-3),var(--brand-2));color:white;padding:12px;border-radius:8px;margin-bottom:12px}
-    .headline{font-weight:700}
-
-    /* Modal */
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:60}
-    .modal.open{display:flex}
-    .modal .panel{width:90%;max-width:780px;background:white;padding:18px;border-radius:10px;max-height:90vh;overflow:auto}
-    .media{max-width:100%;height:auto;margin-top:8px;border-radius:8px}
-
-    /* responsive */
-    @media (max-width:900px){.wrap{padding:12px}}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex HFT Arbitrage Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .ticker-animate { animation: scroll 20s linear infinite; }
+        body { background-color: #030712; color: #ffffff; }
+    </style>
 </head>
-<body>
-  <header>
-    <img src="https://www.powerful.ng/logo_with_black_BG-removebg-preview.png" alt="Powerful logo">
-    <div>
-      <div style="font-weight:700;font-size:18px;color:var(--brand-1)">Powerful</div>
-      <div class="small">Content approval — admin & viewer consoles</div>
-    </div>
-  </header>
+<body class="min-h-screen p-4 md:p-8">
 
-  <main class="wrap">
-    <div class="top-controls">
-      <button id="showAdminBtn">Admin View</button>
-      <button id="showViewerBtn" class="secondary">Viewer View</button>
-    </div>
+    <!-- Header -->
+    <header class="max-w-4xl mx-auto mb-8 border-b border-gray-800 pb-4">
+        <h1 class="text-2xl font-bold text-blue-400">Investment Dashboard</h1>
+    </header>
 
-    <!-- ADMIN PANEL -->
-    <section class="card" id="adminPanel">
-      <div class="admin-header">
-        <div>
-          <div style="font-weight:700;font-size:16px;color:var(--brand-1)">Admin console</div>
-          <div class="small">Sign in to manage posts (password required)</div>
+    <!-- Ticker Tape -->
+    <div class="max-w-4xl mx-auto overflow-hidden bg-gray-900 py-2 mb-8 rounded-lg border border-gray-800">
+        <div class="ticker-animate whitespace-nowrap text-blue-300 font-semibold">
+            Hello, Thompson, the HFT engines have been activated for your account. You will continue to enjoy arbitrage benefits until the stipulated time.
         </div>
-        <div class="small">Admin pwd: <strong>powerful</strong></div>
-      </div>
+    </div>
 
-      <div id="adminAuth" style="margin-top:12px">
-        <div class="inline-row">
-          <input type="password" id="adminPwd" placeholder="Enter admin password">
-          <button id="adminLoginBtn">Sign in</button>
-        </div>
-        <div class="small" style="margin-top:8px;color:#7b96b0">After signing in you can create, edit, delete posts and set viewer access code & password.</div>
-      </div>
-
-      <div id="adminPanelArea" style="display:none;margin-top:12px">
-        <div style="display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:start">
-          <div>
-            <label class="small">Post header</label>
-            <input id="postHeader" type="text" placeholder="Short headline or copy">
-            <label class="small" style="margin-top:8px">Body</label>
-            <textarea id="postBody" rows="4" placeholder="Longer post copy / details"></textarea>
-            <label class="small" style="margin-top:8px">Image or video link (embed URL)</label>
-            <input id="postMedia" type="text" placeholder="https://... (image or video)" />
-
-            <div style="margin-top:10px;display:flex;gap:8px">
-              <button id="createPostBtn">Create post</button>
-              <button class="secondary" id="clearFormBtn">Clear</button>
+    <main class="max-w-4xl mx-auto">
+        <!-- Profile Header -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold">Thompson Clsire</h1>
+                <div class="mt-2 space-y-1 text-gray-400 text-sm">
+                    <p>123@gmail.com</p>
+                    <p>Phone:+212 700543633 </p>
+                </div>
             </div>
-          </div>
-
-          <div class="card" style="background:#fffefc;padding:12px">
-            <div style="font-weight:700;margin-bottom:8px">Viewer access control</div>
-            <label class="small">Access code (required for viewers)</label>
-            <input id="accessCodeInput" type="text" placeholder="Set code viewers must supply">
-            <div style="margin-top:8px;display:flex;gap:8px"><button id="saveAccessBtn">Save</button><button class="secondary" id="generateCodeBtn">Generate</button></div>
-            <div class="small" style="margin-top:10px;color:#436">Current code: <span id="currentCode">—</span></div>
-          </div>
+            <div class="bg-black p-3 rounded-lg text-xs break-all border border-gray-800">
+                <span class="text-gray-500">Withdrawal Address:</span><br>
+                2nb2FyUstY23Ljs3nsZZ298iMemb9RyHdt3rwr1WRgbp
+            </div>
         </div>
 
-        <hr style="margin:16px 0;border:none;border-top:1px solid #eef4fb">
-
-        <div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div style="font-weight:700">Posts</div>
-            <div class="small">You will see approvals and comments here</div>
-          </div>
-          <div id="postsContainer" class="post-list"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEWER PANEL -->
-    <section class="card" id="viewerPanel" style="display:none;margin-top:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-weight:700;font-size:16px;color:var(--brand-1)">Viewer console</div>
-          <div class="small">Sign in with the code provided by your content manager</div>
-        </div>
-        <img src="https://www.powerful.ng/logo_with_black_BG-removebg-preview.png" alt="Powerful" style="height:36px">
-      </div>
-
-      <div id="viewerAuthArea" style="margin-top:12px">
-        <div class="viewer-login">
-          <label class="small">Type in the code password provided by your content manager</label>
-          <input id="viewerCode" type="text" placeholder="Access code">
-          <div style="display:flex;gap:8px"><button id="viewerSignInBtn">Sign in</button><button class="secondary" id="viewerSignOutBtn" style="display:none">Sign out</button></div>
-          <div class="small" style="margin-top:8px;color:#6b7d92">Note: you remain anonymous. Your actions (approve/reject/comments) will be recorded but your identity is not stored.</div>
-        </div>
-      </div>
-
-      <div id="viewerArea" style="display:none;margin-top:12px">
-        <div class="viewer-intro">
-          <div style="font-weight:700">Welcome</div>
-          <div style="margin-top:6px">You can approve, reject and add comments to posts to help us improve. Click any headline to read the full post and respond.</div>
+        <!-- Stats Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 text-center">
+                <div class="text-xs text-gray-500 uppercase">Total Deposit</div>
+                <div class="text-xl font-bold text-green-400">$0.00</div>
+            </div>
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 text-center">
+                <div class="text-xs text-gray-500 uppercase">Profit</div>
+                <div class="text-xl font-bold text-blue-400">$08.00</div>
+            </div>
+            <div class="col-span-2 bg-gray-900 p-4 rounded-xl border border-gray-800 text-center">
+                <div class="text-xs text-gray-500 uppercase">Cycle Countdown</div>
+                <div id="countdown" class="text-xl font-mono font-bold text-yellow-400">72:59:59</div>
+            </div>
         </div>
 
-        <div id="viewerPosts" class="post-list"></div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Modal for post view -->
-  <div id="modal" class="modal">
-    <div class="panel">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div id="modalHeader" style="font-weight:700;font-size:18px"></div>
-          <div id="modalSub" class="small" style="margin-top:6px;color:#556">Post details</div>
+        <!-- Live Prices -->
+        <div id="price-card" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 text-center animate-pulse">Loading Market Data...</div>
         </div>
-        <div><button class="secondary" id="closeModalBtn">Close</button></div>
-      </div>
 
-      <div id="modalBody" style="margin-top:12px"></div>
+        <!-- Withdraw Button -->
+        <div class="my-12 text-center">
+            <button onclick="showModal('modal-withdraw')" class="bg-blue-600 hover:bg-blue-500 transition px-12 py-6 rounded-2xl text-2xl font-bold w-full md:w-auto shadow-lg shadow-blue-900/20">
+                UNDERWAY
+            </button>
+        </div>
 
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-        <button id="approveBtn">Approve</button>
-        <button class="secondary" id="rejectBtn">Reject</button>
-        <div style="flex:1"></div>
-      </div>
+        <!-- Deposit Section -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+            <h2 class="text-xl font-semibold mb-6">Deposit Addresses</h2>
+            <div class="space-y-4" id="address-list"></div>
+        </div>
+    </main>
 
-      <div style="margin-top:12px">
-        <label class="small">Add a short note (optional)</label>
-        <textarea id="modalComment" rows="3" placeholder="Your feedback to the content manager"></textarea>
-        <div style="display:flex;justify-content:flex-end;margin-top:8px"><button id="sendResponseBtn">Send response</button></div>
-      </div>
+    <!-- Footer -->
+    <footer class="max-w-4xl mx-auto mt-12 p-6 text-center text-gray-600 text-sm border-t border-gray-800">
+        &copy; 2026 All Rights Reserved Apex HFT
+    </footer>
+
+    <!-- Withdraw Modal -->
+    <div id="modal-withdraw" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 p-8 rounded-2xl border border-gray-700 max-w-sm text-center">
+            <h3 class="text-xl font-bold mb-4">Processing</h3>
+            <p class="text-gray-400 mb-6">Request processing... Please check your email for confirmation.</p>
+            <button onclick="hideModal('modal-withdraw')" class="bg-blue-600 px-6 py-2 rounded-lg text-white">Close</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded',async ()=>{
-      /* Supabase-backed app (no user auth). */
-      const SUPABASE_URL = 'https://xgdjgxgodwxtpjxkcpaf.supabase.co';
-      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnZGpneGdvZHd4dHBqeGtjcGFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NDMwNTYsImV4cCI6MjA4MDMxOTA1Nn0.lTPmOW2ZxlwSv1yiJkIvdK4bEsWH2dC71bjN7WMbJpM';
-      const { createClient } = supabase;
-      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+    <!-- Testimonial Overlay -->
+    <div id="testimonial-overlay" class="hidden fixed bottom-8 right-8 max-w-sm bg-gray-900 border border-blue-500 p-6 rounded-2xl shadow-2xl z-40">
+        <button onclick="hideModal('testimonial-overlay')" class="absolute top-2 right-2 text-gray-500 hover:text-white">✕</button>
+        <p id="testimonial-text" class="text-gray-300 italic mb-4"></p>
+        <p id="testimonial-name" class="font-bold text-blue-400"></p>
+    </div>
 
-      const ADMIN_PWD = 'powerful';
+    <script>
+        let previousPrices = {};
+        
+        // Load persistent state for Testimonials
+        let testimonialIndex = parseInt(localStorage.getItem('apex_testimonial_index') || "0");
+        
+        const testimonials = [
+            { name: "Sarah Chen", text: "Finally a platform that actually delivers. Made my first $2,400 in 3 days with zero stress." },
+            { name: "Michael Torres", text: "The arbitrage engine is insane. So simple yet so profitable. Loving this project!" },
+            { name: "Aisha Rahman", text: "I’ve never seen money come in this consistently. Apex is legit." },
+            { name: "David Okon", text: "Easiest earnings I’ve ever made. The system does all the work." },
+            { name: "Rachel Kim", text: "I love how transparent and smooth everything is. Already recommending to friends." },
+            { name: "Jamal Wright", text: "Arbitrage has never been this easy. Apex changed the game for me." },
+            { name: "Priya Sharma", text: "Just hit my first $10k. Can’t believe how effortless it feels." },
+            { name: "Carlos Mendoza", text: "This is the real deal. Fast payouts and consistent profits." },
+            { name: "Fatima Adebayo", text: "I was skeptical at first, but the results speak for themselves." },
+            { name: "Kevin Zhang", text: "Best investment decision I’ve made this year. Thank you Apex!" },
+            { name: "Nadia Petrova", text: "The engine runs 24/7 and so does my profit. Incredible." },
+            { name: "Marcus Okoro", text: "Simple setup, massive returns. I’m truly impressed." },
+            { name: "Elena Rodriguez", text: "I love this arbitrage system. It actually works!" },
+            { name: "Solomon Adeyemi", text: "Been running for 2 weeks and already in profit. Legit platform." },
+            { name: "Jessica Wong", text: "So glad I joined. Earning while I sleep is a dream come true." },
+            { name: "Ahmed Khalil", text: "Apex HFT is the smartest move I’ve made in crypto." },
+            { name: "Linda Moreau", text: "Super clean interface and even better results." },
+            { name: "Chinedu Eze", text: "The profits are real. I check my wallet and smile every day." },
+            { name: "Sophia Laurent", text: "Finally found a platform I can trust. Highly recommended." },
+            { name: "Robert Kimani", text: "This arbitrage engine is pure genius. Loving every second." },
+            { name: "Emma Thompson", text: "Easy money with zero headaches. Apex is amazing." },
+            { name: "Taiwo Adewale", text: "I’ve made more in 10 days than my salary last month." },
+            { name: "Olivia Santos", text: "Love the technology behind this. Truly next level." },
+            { name: "Ibrahim Khan", text: "Payouts are fast and consistent. Very satisfied." },
+            { name: "Grace Lee", text: "Best arbitrage platform I’ve ever used. Period." },
+            { name: "Daniel Okafor", text: "I tell everyone about Apex. It just works." },
+            { name: "Maya Patel", text: "Super smooth and profitable. I’m hooked!" },
+            { name: "Joseph Mensah", text: "The engine is a money printer. Thank you!" },
+            { name: "Isabella Rossi", text: "So easy even my mom could use it." },
+            { name: "Victor Okeke", text: "Real results, real profits. Loving it." },
+            { name: "Zara Ahmed", text: "This changed my financial life for good." },
+            { name: "Henry Dubois", text: "Arbitrage made simple and highly rewarding." },
+            { name: "Amina Diallo", text: "I sleep better knowing my money is working." },
+            { name: "Samuel Green", text: "Apex delivers exactly what they promise." },
+            { name: "Layla Hassan", text: "Best decision I made in 2026." },
+            { name: "Noah Schmidt", text: "Profits every single day. Unreal." },
+            { name: "Sofia Morales", text: "I love how reliable this platform is." },
+            { name: "Kwame Boateng", text: "Finally a system that doesn’t disappoint." },
+            { name: "Amelia Chen", text: "Super clean and super profitable." },
+            { name: "Ethan Moreau", text: "Made back my investment in 4 days." },
+            { name: "Fatima Bello", text: "This is how investing should be." },
+            { name: "Lucas Moreau", text: "I’m genuinely impressed with the results." },
+            { name: "Nia Okoro", text: "Arbitrage has never been this fun." },
+            { name: "James Leclerc", text: "Fast, reliable, and very profitable." },
+            { name: "Zara Khan", text: "I can’t stop smiling when I check my balance." },
+            { name: "Malik Johnson", text: "Apex is built different. Truly." },
+            { name: "Elena Petrova", text: "The returns are consistent and impressive." },
+            { name: "Diego Silva", text: "Loving the passive income stream." },
+            { name: "Priya Nair", text: "So glad I found this gem." },
+            { name: "Anthony Osei", text: "This engine is a beast. Well done!" },
+            { name: "Sophia Wang", text: "Easiest profits I’ve ever made." },
+            { name: "Jamal Adeyemi", text: "Apex is changing lives one trade at a time." },
+            { name: "Isabella Costa", text: "Very professional and highly effective." },
+            { name: "Michael Adebayo", text: "I trust this platform 100%." },
+            { name: "Layla Thompson", text: "The results keep getting better." },
+            { name: "Omar Farouk", text: "Simple, clean, and very rewarding." },
+            { name: "Rachel Dubois", text: "I love everything about Apex HFT." },
+            { name: "David Mensah", text: "Best arbitrage experience ever." },
+            { name: "Aisha Mohammed", text: "Profits are rolling in nicely." },
+            { name: "Kevin Okafor", text: "This is the future of investing." },
+            { name: "Maya Rodriguez", text: "Super reliable and user-friendly." },
+            { name: "Solomon Khan", text: "Made $8k in my first two weeks." },
+            { name: "Emma Leclerc", text: "I’m a believer now." },
+            { name: "Chinedu Okeke", text: "The engine never sleeps and neither do my gains." },
+            { name: "Zara Patel", text: "Extremely satisfied with my returns." },
+            { name: "Lucas Adewale", text: "This platform is pure gold." },
+            { name: "Fatima Wong", text: "So easy and so effective." },
+            { name: "Henry Kim", text: "Best investment I’ve made." },
+            { name: "Nia Santos", text: "I recommend Apex to everyone." },
+            { name: "Joseph Chen", text: "The profits feel almost too good." },
+            { name: "Sophia Okoro", text: "Apex makes arbitrage look easy." },
+            { name: "Ahmed Bello", text: "Very transparent and trustworthy." },
+            { name: "Olivia Mensah", text: "My portfolio has never looked better." },
+            { name: "Taiwo Green", text: "I’m truly grateful I joined." },
+            { name: "Layla Silva", text: "This is the real deal." },
+            { name: "Marcus Khan", text: "Fast setup, faster profits." },
+            { name: "Priya Osei", text: "Loving the daily earnings." },
+            { name: "Ethan Diallo", text: "Apex exceeded all my expectations." },
+            { name: "Amina Rossi", text: "So smooth and stress-free." },
+            { name: "Samuel Kimani", text: "This is financial freedom." },
+            { name: "Grace Moreau", text: "I check my wallet and just smile." },
+            { name: "Victor Laurent", text: "Arbitrage done right." },
+            { name: "Zara Okon", text: "Extremely happy with my results." },
+            { name: "Daniel Hassan", text: "Apex is a game changer." },
+            { name: "Maya Adebayo", text: "Best platform hands down." },
+            { name: "Kwame Wright", text: "Profits are consistent and growing." },
+            { name: "Isabella Okeke", text: "I love this project so much." },
+            { name: "Noah Patel", text: "Super clean and super profitable." },
+            { name: "Rachel Khan", text: "This is how real money is made." },
+            { name: "James Adeyemi", text: "Apex never disappoints." },
+            { name: "Fatima Leclerc", text: "I feel so lucky to have found this." },
+            { name: "Malik Santos", text: "The engine is incredibly powerful." },
+            { name: "Sophia Okafor", text: "Easiest money I’ve ever earned." },
+            { name: "Lucas Bello", text: "Very impressed with the performance." },
+            { name: "Aisha Moreau", text: "Apex is my new favorite platform." },
+            { name: "Henry Kim", text: "Results are better than I expected." },
+            { name: "Zara Mensah", text: "I’m officially a fan." },
+            { name: "David Costa", text: "This is the smartest move I’ve made." },
+            { name: "Emma Adewale", text: "Loving every profit that comes in." },
+            { name: "Chinedu Thompson", text: "Apex HFT is the future. Period." }
+        ];
 
-      // Utilities
-      function qs(id){return document.getElementById(id)}
+        const assets = [
+            { id: 'btc', name: 'BTC', addr: 'bc1q3ucw3ddh8cszq63n5nesghnyluc2gkrsnq39ws' },
+            { id: 'sol', name: 'SOL', addr: '8jVF1ZxNK3RD96BazJDQqvJWYMWi3WJ5U3ESSt4hUXBc' },
+            { id: 'bnb', name: 'BNB', addr: '0xA18d7A53655f5fa110dd7D17A33FA1Ff8fc2Ef55' },
+            { id: 'usdt', name: 'USDT (TRX)', addr: 'TQhRGzipWiT8dy4smU4EbK5TzLCTgHzB5W' },
+            { id: 'eth', name: 'ETH', addr: '0xA18d7A53655f5fa110dd7D17A33FA1Ff8fc2Ef55' }
+        ];
 
-      // DOM refs
-      const adminLoginBtn = qs('adminLoginBtn');
-      const adminPwd = qs('adminPwd');
-      const adminPanelArea = qs('adminPanelArea');
-      const postsContainer = qs('postsContainer');
-      const createPostBtn = qs('createPostBtn');
-      const clearFormBtn = qs('clearFormBtn');
-      const postHeader = qs('postHeader');
-      const postBody = qs('postBody');
-      const postMedia = qs('postMedia');
-      const accessCodeInput = qs('accessCodeInput');
-      const saveAccessBtn = qs('saveAccessBtn');
-      const generateCodeBtn = qs('generateCodeBtn');
-      const currentCodeSpan = qs('currentCode');
-
-      const viewerSignInBtn = qs('viewerSignInBtn');
-      const viewerSignOutBtn = qs('viewerSignOutBtn');
-      const viewerCode = qs('viewerCode');
-      const viewerArea = qs('viewerArea');
-      const viewerPosts = qs('viewerPosts');
-      const viewerAuthArea = qs('viewerAuthArea');
-
-      const modal = qs('modal');
-      const modalHeader = qs('modalHeader');
-      const modalBody = qs('modalBody');
-      const closeModalBtn = qs('closeModalBtn');
-      const approveBtn = qs('approveBtn');
-      const rejectBtn = qs('rejectBtn');
-      const sendResponseBtn = qs('sendResponseBtn');
-      const modalComment = qs('modalComment');
-
-      const showAdminBtn = qs('showAdminBtn');
-      const showViewerBtn = qs('showViewerBtn');
-      const adminPanel = qs('adminPanel');
-      const viewerPanel = qs('viewerPanel');
-
-      // App state
-      let posts = [];
-      let settings = { accessCode: 'user' };
-      let currentEditId = null;
-      let viewerSession = null; // {anonId, code}
-
-      // Small helper to show alerts
-      function notify(msg){alert(msg)}
-
-      // Load settings from DB (config table id=1)
-      async function loadSettings(){
-        try{
-          const { data, error } = await sb.from('config').select('viewer_code').eq('id',1).single();
-          if(error && error.code !== 'PGRST116') console.warn('loadSettings error',error);
-          settings.accessCode = data && data.viewer_code ? data.viewer_code : 'user';
-          if(currentCodeSpan) currentCodeSpan.textContent = settings.accessCode;
-        }catch(e){console.error(e)}
-      }
-
-      // Save access code to DB
-      async function saveAccess(code){
-        try{
-          const { data, error } = await sb.from('config').upsert({id:1, viewer_code: code}, { returning: 'minimal' });
-          if(error) {console.error('saveAccess error', error); notify('Failed to save access code')}
-          else{ settings.accessCode = code; if(currentCodeSpan) currentCodeSpan.textContent = code; notify('Saved') }
-        }catch(e){console.error(e);notify('Failed to save')}
-      }
-
-      // Load posts from DB
-      async function loadPosts(){
-        try{
-          const { data, error } = await sb.from('posts').select('*').order('createdAt', { ascending: false });
-          if(error) { console.error('loadPosts error',error); posts = []; return }
-          // Map DB columns to app model
-          posts = (data||[]).map(r=>({ id: r.id, header: r.heading, body: r.text, media: r.medialink, status: r.status, comment: r.comment, createdAt: r.createdAt }));
-        }catch(e){console.error(e);posts=[]}
-      }
-
-      // Create post
-      async function createPost(){
-        const header = (postHeader.value||'').trim();
-        const body = (postBody.value||'').trim();
-        const media = (postMedia.value||'').trim();
-        if(!header || !body){notify('Header and body are required');return}
-        try{
-          const { error } = await sb.from('posts').insert({ heading: header, text: body, medialink: media });
-          if(error) { console.error('createPost error',error); notify('Failed to create post'); return }
-          postHeader.value='';postBody.value='';postMedia.value='';
-          await loadPosts(); renderAdminPosts(); renderViewerList();
-        }catch(e){console.error(e);notify('Failed')}
-      }
-
-      // Update post
-      async function updatePost(id){
-        const header = (postHeader.value||'').trim();
-        const body = (postBody.value||'').trim();
-        const media = (postMedia.value||'').trim();
-        if(!header || !body){notify('Header and body are required');return}
-        try{
-          const { error } = await sb.from('posts').update({ heading: header, text: body, medialink: media }).eq('id', id);
-          if(error){console.error('updatePost error',error);notify('Failed to update');return}
-          currentEditId = null; if(createPostBtn) createPostBtn.textContent='Create post';
-          postHeader.value='';postBody.value='';postMedia.value='';
-          await loadPosts(); renderAdminPosts(); renderViewerList();
-        }catch(e){console.error(e);notify('Failed')}
-      }
-
-      // Delete post
-      async function deletePost(id){
-        if(!confirm('Delete this post?')) return;
-        try{
-          const { error } = await sb.from('posts').delete().eq('id', id);
-          if(error){console.error('deletePost error',error);notify('Failed to delete');return}
-          await loadPosts(); renderAdminPosts(); renderViewerList();
-        }catch(e){console.error(e);notify('Failed')}
-      }
-
-      // Admin render
-      function renderAdminPosts(){
-        if(!postsContainer) return;
-        postsContainer.innerHTML='';
-        if(posts.length===0){postsContainer.innerHTML='<div class="small">No posts yet</div>';return}
-        posts.forEach(p=>{
-          const div=document.createElement('div');div.className='post-item';
-          const left=document.createElement('div');
-          left.innerHTML=`<div style="font-weight:700">${escapeHtml(p.header)}</div><div class="small">${escapeHtml((p.body||'')).slice(0,120)}${(p.body||'').length>120?'...':''}</div><div class="small">Status: ${p.status||'Pending'}</div>`;
-          const right=document.createElement('div');
-          const stats=`<div class="small">Comments: ${p.comment ? p.comment.split('\n').length : 0}</div>`;
-          right.innerHTML = stats + '<div style="margin-top:8px;display:flex;gap:6px"><button data-id="'+p.id+'" class="editBtn">Edit</button><button class="secondary" data-id="'+p.id+'">Delete</button></div>';
-          div.appendChild(left);div.appendChild(right);postsContainer.appendChild(div);
+        // Setup addresses
+        const list = document.getElementById('address-list');
+        assets.forEach(a => {
+            list.innerHTML += `
+                <div class="flex justify-between items-center p-4 bg-black rounded-lg border border-gray-800">
+                    <div><span class="font-bold">${a.name}:</span> <span class="text-sm font-mono text-gray-400 break-all ml-2" id="${a.id}">${a.addr}</span></div>
+                    <button onclick="copy('${a.id}')" class="bg-gray-800 px-3 py-1 rounded hover:bg-gray-700 text-sm transition" id="btn-${a.id}">Copy</button>
+                </div>`;
         });
-        // attach handlers
-        postsContainer.querySelectorAll('button[data-id]').forEach(b=>{
-          b.addEventListener('click',()=>{
-            const id = b.getAttribute('data-id');
-            if(b.textContent==='Edit') startEdit(id);
-            else deletePost(id);
-          });
-        });
-      }
 
-      // Viewer render
-      function renderViewerList(){
-        if(!viewerPosts) return;
-        viewerPosts.innerHTML='';
-        if(posts.length===0){viewerPosts.innerHTML='<div class="small">No posts available</div>';return}
-        posts.forEach(p=>{
-          const div=document.createElement('div');div.className='post-item';
-          div.innerHTML=`<div style="flex:1"><div class="headline">${escapeHtml(p.header)}</div><div class="small">${escapeHtml((p.body||'')).slice(0,80)}${(p.body||'').length>80?'...':''}</div><div class="small">Status: ${p.status||'Pending'}</div></div>`;
-          div.addEventListener('click',()=>openModal(p.id));
-          viewerPosts.appendChild(div);
-        });
-      }
-
-      // Start edit
-      function startEdit(id){
-        const p = posts.find(x=>x.id===id); if(!p) return;
-        postHeader.value = p.header || '';
-        postBody.value = p.body || '';
-        postMedia.value = p.media || '';
-        currentEditId = id; if(createPostBtn) createPostBtn.textContent='Save changes'; window.scrollTo({top:0,behavior:'smooth'});
-      }
-
-      // Modal open
-      function openModal(id){
-        const p = posts.find(x=>x.id===id); if(!p) return;
-        if(modalHeader) modalHeader.textContent = p.header;
-        if(modalBody) {
-          modalBody.innerHTML = `<div style="white-space:pre-line">${escapeHtml(p.body||'')}</div>`;
-          if(p.media){
-            if(p.media.match(/\.(jpg|jpeg|png|gif|webp)$/i) || p.media.includes('image')){
-              modalBody.innerHTML += `<img src="${escapeHtmlAttr(p.media)}" class="media">`;
-            } else {
-              modalBody.innerHTML += `<div style="margin-top:10px"><a href="${escapeHtmlAttr(p.media)}" target="_blank">Open media</a></div>`;
-            }
-          }
-          modalBody.innerHTML += `<div style="margin-top:10px" class="small">Status: ${p.status||'Pending'}</div>`;
-          modalBody.innerHTML += `<div style="margin-top:8px" class="small">${escapeHtml(p.comment||'')}</div>`;
+        async function fetchPrices() {
+            try {
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,solana,binancecoin,ethereum&vs_currencies=usd');
+                const data = await res.json();
+                const map = { bitcoin: 'BTC', solana: 'SOL', binancecoin: 'BNB', ethereum: 'ETH' };
+                const container = document.getElementById('price-card');
+                container.innerHTML = '';
+                
+                Object.keys(map).forEach(key => {
+                    const price = data[key].usd;
+                    const color = previousPrices[key] > price ? 'text-red-500' : (previousPrices[key] < price ? 'text-green-500' : 'text-white');
+                    container.innerHTML += `
+                        <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 text-center">
+                            <div class="text-xs text-gray-500">${map[key]}</div>
+                            <div class="font-bold ${color}">$${price.toLocaleString()}</div>
+                        </div>`;
+                    previousPrices[key] = price;
+                });
+            } catch (e) { console.error("API Limit reached - ignoring."); }
         }
-        if(modal){ modal.dataset.postId = id; modal.classList.add('open'); }
-      }
-      if(closeModalBtn) closeModalBtn.addEventListener('click',()=>{ if(modal) modal.classList.remove('open'); if(modalComment) modalComment.value=''; });
 
-      // Record response: set status and append comment to comment field
-      async function recordResponse(action){
-        const id = modal && modal.dataset.postId; const p = posts.find(x=>x.id===id); if(!p) return;
-        if(!viewerSession){notify('You must sign in as a viewer to respond');return}
-        const note = (modalComment && modalComment.value.trim()) || '';
-        const newStatus = action==='approve' ? 'Approved' : (action==='reject' ? 'Disapproved' : p.status || 'Pending');
-        const time = new Date().toISOString();
-        const entry = `${time} | ${viewerSession.anonId} | ${action} | ${note}`;
-        const combined = (p.comment ? p.comment + '\n' : '') + entry;
-        try{
-          const { error } = await sb.from('posts').update({ status: newStatus, comment: combined }).eq('id', id);
-          if(error){console.error('recordResponse error',error);notify('Failed to save response');return}
-          await loadPosts(); renderAdminPosts(); renderViewerList(); if(modal) modal.classList.remove('open'); if(modalComment) modalComment.value=''; notify('Response recorded');
-        }catch(e){console.error(e);notify('Failed')}
-      }
+        function copy(id) {
+            const text = document.getElementById(id).innerText;
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            
+            const btn = document.getElementById('btn-' + id);
+            btn.innerText = 'Copied!';
+            btn.classList.add('bg-green-800');
+            setTimeout(() => { btn.innerText = 'Copy'; btn.classList.remove('bg-green-800'); }, 2000);
+        }
 
-      if(approveBtn) approveBtn.addEventListener('click',()=>recordResponse('approve'));
-      if(rejectBtn) rejectBtn.addEventListener('click',()=>recordResponse('reject'));
-      if(sendResponseBtn) sendResponseBtn.addEventListener('click',()=>recordResponse('comment'));
+        function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-      // Admin login
-      if(adminLoginBtn) adminLoginBtn.addEventListener('click',async ()=>{
-        if(adminPwd.value===ADMIN_PWD){
-          qs('adminAuth').style.display='none'; adminPanelArea.style.display='block';
-          await loadSettings(); await loadPosts(); renderAdminPosts(); renderViewerList();
-        } else notify('Invalid admin password');
-      });
+        // Updated Testimonial Logic
+        function showTestimonial() {
+            const t = testimonials[testimonialIndex];
+            document.getElementById('testimonial-text').innerText = `"${t.text}"`;
+            document.getElementById('testimonial-name').innerText = `- ${t.name}`;
+            document.getElementById('testimonial-overlay').classList.remove('hidden');
+            
+            // Auto-hide after 5 minutes
+            setTimeout(() => { document.getElementById('testimonial-overlay').classList.add('hidden'); }, 300000);
+            
+            // Advance index and save state
+            testimonialIndex = (testimonialIndex + 1) % testimonials.length;
+            localStorage.setItem('apex_testimonial_index', testimonialIndex);
+            localStorage.setItem('apex_testimonial_last_time', Date.now());
+        }
 
-      // Create / update post
-      if(createPostBtn) createPostBtn.addEventListener('click',async ()=>{
-        if(currentEditId) await updatePost(currentEditId); else await createPost();
-      });
-      if(clearFormBtn) clearFormBtn.addEventListener('click',()=>{ postHeader.value=''; postBody.value=''; postMedia.value=''; currentEditId=null; if(createPostBtn) createPostBtn.textContent='Create post'; });
+        function checkTestimonialTrigger() {
+            const lastTime = localStorage.getItem('apex_testimonial_last_time');
+            if (!lastTime || (Date.now() - parseInt(lastTime) >= 7200000)) {
+                showTestimonial();
+            }
+        }
 
-      // Access code control
-      if(saveAccessBtn) saveAccessBtn.addEventListener('click',()=>{ const code = (accessCodeInput.value||'').trim(); if(!code) return notify('Access code cannot be empty'); saveAccess(code); });
-      if(generateCodeBtn) generateCodeBtn.addEventListener('click',()=>{ const code = 'P-'+Math.random().toString(36).slice(2,8).toUpperCase(); accessCodeInput.value = code; });
+        // Countdown Logic (Persistence-aware)
+        let endTime = localStorage.getItem('apex_countdown_end');
+        if (!endTime) {
+            endTime = Date.now() + (96 * 60 * 60 * 1000);
+            localStorage.setItem('apex_countdown_end', endTime);
+        }
 
-      // Viewer sign in (only access code required)
-      if(viewerSignInBtn) viewerSignInBtn.addEventListener('click',async ()=>{
-        const code = (viewerCode.value||'').trim();
-        await loadSettings();
-        if(!settings.accessCode){notify('No access code set by admin');return}
-        if(code !== settings.accessCode){notify('Invalid code');return}
-        viewerSession = { code, anonId: 'anon-'+Math.random().toString(36).slice(2,9) };
-        if(viewerAuthArea) viewerAuthArea.style.display='none'; if(viewerArea) viewerArea.style.display='block'; if(viewerSignOutBtn) viewerSignOutBtn.style.display='inline-block';
-        await loadPosts(); renderViewerList();
-      });
-      if(viewerSignOutBtn) viewerSignOutBtn.addEventListener('click',()=>{ viewerSession=null; if(viewerAuthArea) viewerAuthArea.style.display='block'; if(viewerArea) viewerArea.style.display='none'; if(viewerSignOutBtn) viewerSignOutBtn.style.display='none'; if(viewerCode) viewerCode.value=''; });
+        function updateCountdown() {
+            const now = Date.now();
+            const remaining = Math.max(0, endTime - now);
+            const h = Math.floor(remaining / 3600000);
+            const m = Math.floor((remaining % 3600000) / 60000);
+            const s = Math.floor((remaining % 60000) / 1000);
+            document.getElementById('countdown').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
 
-      // UI toggle
-      if(showAdminBtn) showAdminBtn.addEventListener('click',()=>{ adminPanel.style.display='block'; viewerPanel.style.display='none'; });
-      if(showViewerBtn) showViewerBtn.addEventListener('click',()=>{ adminPanel.style.display='none'; viewerPanel.style.display='block'; });
-
-      // Initial load
-      await loadSettings(); await loadPosts(); renderAdminPosts(); renderViewerList();
-
-      // Admin double-click for details
-      if(postsContainer) postsContainer.addEventListener('dblclick',e=>{
-        const item = e.target.closest('.post-item'); if(!item) return; const header = item.querySelector('div').innerText.split('\n')[0]; const p = posts.find(x=>x.header===header); if(p){ const comments = (p.comment||'').split('\n').join('\n'); alert(`Post: ${p.header}\n\nBody:\n${p.body}\n\nStatus: ${p.status||'Pending'}\n\nComments:\n${comments||'No comments'}`); }
-      });
-
-      // Helpers
-      function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-      function escapeHtmlAttr(s){return String(s||'').replace(/"/g,'%22').replace(/'/g,'%27');}
-
-    });
-  </script>
+        setInterval(fetchPrices, 10000);
+        setInterval(updateCountdown, 1000);
+        setInterval(checkTestimonialTrigger, 60000); // Check every minute
+        
+        fetchPrices();
+        updateCountdown();
+        checkTestimonialTrigger();
+    </script>
 </body>
 </html>
